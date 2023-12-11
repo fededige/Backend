@@ -1,0 +1,87 @@
+version: '3'
+services:
+  gateway:
+    build: apiGateway/.
+    image: prog-gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - book
+      - author
+    networks:
+      - prog-network
+    environment:
+      - BOOK_HOST=book
+      - BOOK_PORT=8080
+      - AUTHOR_HOST=author
+      - AUTHOR_PORT=8080
+
+  db-book:
+    container_name: db-book
+    image: "postgres"
+    networks:
+      - prog-network
+    environment:
+      POSTGRES_DB: db-book
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: data-db-book
+        target: /data
+        volume:
+          nocopy: true
+
+  book:
+    build: book/.
+    image: prog-book
+    container_name: prog-book_c
+    environment:
+      POSTGRES_DB_HOST: db-book
+      API_GATEWAY_HOST: api-gateway
+    depends_on:
+      - db-book
+    networks:
+      - prog-network
+
+  db-author:
+    container_name: db-author
+    image: "postgres"
+    networks:
+      - prog-network
+    environment:
+      POSTGRES_DB: db-author
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: data-db-author
+        target: /data
+        volume:
+          nocopy: true
+
+  author:
+    build: author/.
+    image: prog-author
+    container_name: prog-author_c
+    environment:
+      POSTGRES_DB_HOST: db-author
+      API_GATEWAY_HOST: api-gateway
+    depends_on:
+      - db-author
+    networks:
+      - prog-network
+
+networks:
+  prog-network:
+
+volumes:
+  data-db-book:
+  data-db-author:
+
+
+# docker-compose build && docker-compose up
+
