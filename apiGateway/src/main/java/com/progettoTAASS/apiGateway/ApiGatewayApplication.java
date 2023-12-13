@@ -31,5 +31,4 @@ public class ApiGatewayApplication {
 						.uri(author_microservice_url))
 				.build();
 	}
-
 }

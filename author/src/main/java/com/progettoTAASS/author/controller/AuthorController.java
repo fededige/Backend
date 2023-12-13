@@ -15,6 +15,9 @@ public class AuthorController {
     @Autowired
     AuthorRepository repository;
 
+    @Autowired
+    private RabbitMqSender rabbitMqSender;
+
     @GetMapping("/authors")
     public List<Author> getAllAuthors() {
         System.out.println("Get all Authors...");
@@ -31,5 +34,11 @@ public class AuthorController {
 
         Author _author = repository.save(new Author(author.getName()));
         return _author;
+    }
+
+    @GetMapping("/send/{message}")
+    public void sendMessage(@PathVariable String message) {
+        System.out.println("sendMessage: sending \"" + message + "\"...");
+        rabbitMqSender.send(message);
     }
 }

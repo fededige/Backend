@@ -1,0 +1,13 @@
+package com.progettoTAASS.book.rabbitMqConfig;
+
+import org.springframework.amqp.core.Queue;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RabbitMqConfig {
+    @Bean
+    public Queue book() {
+        return new Queue("book",true);
+    }
+}
