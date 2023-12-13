@@ -2,7 +2,7 @@ version: '3'
 services:
   gateway:
     build: apiGateway/.
-    image: prog-gateway
+    image: project-gateway
     container_name: gateway
     ports:
       - "8080:8080"
@@ -23,9 +23,9 @@ services:
     networks:
       - prog-network
     environment:
-      POSTGRES_DB: db-book
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: project-book
+      POSTGRES_USER: book
+      POSTGRES_PASSWORD: book
     restart: unless-stopped
     volumes:
       - type: volume
@@ -36,7 +36,7 @@ services:
 
   book:
     build: book/.
-    image: prog-book
+    image: project-book
     container_name: prog-book_c
     environment:
       POSTGRES_DB_HOST: db-book
@@ -52,9 +52,9 @@ services:
     networks:
       - prog-network
     environment:
-      POSTGRES_DB: db-author
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: project-author
+      POSTGRES_USER: author
+      POSTGRES_PASSWORD: author
     restart: unless-stopped
     volumes:
       - type: volume
@@ -65,7 +65,7 @@ services:
 
   author:
     build: author/.
-    image: prog-author
+    image: project-author
     container_name: prog-author_c
     environment:
       POSTGRES_DB_HOST: db-author
