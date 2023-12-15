@@ -14,11 +14,6 @@ public class RabbitMqSender {
     @Autowired
     private Queue messageQueue;
 
-    public RabbitMqSender(RabbitTemplate rabbitTemplate, Queue messageQueue) {
-        this.rabbitTemplate = rabbitTemplate;
-        this.messageQueue = messageQueue;
-    }
-
     public void send(String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());

@@ -24,6 +24,7 @@ services:
     depends_on:
       - book
       - author
+      - rabbitmq
     networks:
       - project-network
     environment:
@@ -60,6 +61,7 @@ services:
     depends_on:
       - db-book
       - rabbitmq
+      - author
     networks:
       - project-network
 
