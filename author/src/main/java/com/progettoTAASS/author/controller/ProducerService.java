@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.awt.print.Book;
+import com.progettoTAASS.author.model.Book;
 
 @Component
 public class ProducerService {
@@ -29,6 +29,7 @@ public class ProducerService {
         String bookJson = "";
         try {
             bookJson = o.writeValueAsString(book);
+            System.out.println(bookJson);
             rabbitTemplate.convertAndSend(exchange,routingkey, bookJson);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

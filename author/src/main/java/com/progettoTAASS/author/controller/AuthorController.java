@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.progettoTAASS.author.model.Author;
+import com.progettoTAASS.author.model.Book;
 
-import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.List;
 
