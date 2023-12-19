@@ -2,12 +2,9 @@ package com.progettoTAASS.author.controller;
 
 import com.progettoTAASS.author.repository.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.progettoTAASS.author.model.Author;
-import com.progettoTAASS.author.model.Book;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,15 +12,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/")
 public class AuthorController {
-    private final ProducerService producerService;
-
     @Autowired
     AuthorRepository repository;
 
     @Autowired
-    public AuthorController(ProducerService producerService) {
-        this.producerService = producerService;
-    }
+    private RabbitMqSender rabbitMqSender;
 
     @GetMapping("/authors")
     public List<Author> getAllAuthors() {
@@ -43,11 +36,9 @@ public class AuthorController {
         return _author;
     }
 
-    @PostMapping("/produce")
-    public ResponseEntity<String> sendMessage(@RequestBody Book book) {
-        producerService.sendMessage(book);
-        System.out.println("book sent: " + book);
-        String response = "\nmessaggio ricevuto";
-        return ResponseEntity.ok(response);
+    @GetMapping("/send/{message}")
+    public void sendMessage(@PathVariable String message) {
+        System.out.println("sendMessage: sending \"" + message + "\"...");
+        rabbitMqSender.send(message);
     }
 }
