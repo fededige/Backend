@@ -1,43 +1,32 @@
 package com.progettoTAASS.author.rabbitMqConfig;
 
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
+/***
+ * This class is used to configure the queue on rabbitmq, It creates a bean that is used by the RabbitMqSender class to send a message to the queue
+ * The queue "kitchen" this way is also automatically create on RabbitMq.
+ * In this context it shouldn't be necessary to create the configuration for the exchange, since we are just listening to a queue, and not publishing to an exchange.
+ * but still if this file is removed the queue will not be created on RabbitMq and if the queue is not created by another service the RabbitMqReceiver will not work.
+ */
+@EnableRabbit
 @Configuration
 public class RabbitMqConfig {
-    @Value("${spring.rabbitmq.host}")
-    String host;
-
-    @Value("${spring.rabbitmq.username}")
-    String username;
-
-    @Value("${spring.rabbitmq.password}")
-    String password;
+    /*@Value("${queue.name}")
+    private String message;
 
     @Bean
-    CachingConnectionFactory connectionFactory() {
-        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(host);
-        cachingConnectionFactory.setUsername(username);
-        cachingConnectionFactory.setPassword(password);
-        return cachingConnectionFactory;
-    }
-
-    /*
-    @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+    public Queue author() {
+        return new Queue(message,true);
     }*/
 
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        //rabbitTemplate.setMessageConverter(jsonMessageConverter());
-        return rabbitTemplate;
+    public Queue testQueue() {
+        return new Queue("testQueue", true);
     }
+
 }
