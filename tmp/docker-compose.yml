@@ -1,0 +1,108 @@
+version: '3'
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - project-network
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: data-rabbitmq
+        target: /var/lib/rabbitmq
+
+  gateway:
+    build: apiGateway/.
+    image: project-gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - book
+      - author
+      - rabbitmq
+    networks:
+      - project-network
+    environment:
+      - BOOK_HOST=book
+      - BOOK_PORT=8080
+      - AUTHOR_HOST=author
+      - AUTHOR_PORT=8080
+
+  db-book:
+    container_name: db-book
+    image: "postgres"
+    networks:
+      - project-network
+    environment:
+      POSTGRES_DB: project-book
+      POSTGRES_USER: book
+      POSTGRES_PASSWORD: book
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: data-db-book
+        target: /data
+        volume:
+          nocopy: true
+
+  book:
+    build: book/.
+    image: project-book
+    container_name: prog-book_c
+    environment:
+      POSTGRES_DB_HOST: db-book
+      API_GATEWAY_HOST: api-gateway
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - db-book
+      - rabbitmq
+      - author
+    networks:
+      - project-network
+
+  db-author:
+    container_name: db-author
+    image: "postgres"
+    networks:
+      - project-network
+    environment:
+      POSTGRES_DB: project-author
+      POSTGRES_USER: author
+      POSTGRES_PASSWORD: author
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: data-db-author
+        target: /data
+        volume:
+          nocopy: true
+
+  author:
+    build: author/.
+    image: project-author
+    container_name: prog-author_c
+    environment:
+      POSTGRES_DB_HOST: db-author
+      API_GATEWAY_HOST: api-gateway
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - db-author
+      - rabbitmq
+    networks:
+      - project-network
+
+networks:
+  project-network:
+
+volumes:
+  data-db-book:
+  data-db-author:
+  data-rabbitmq:
+
+
+# docker-compose build && docker-compose up
