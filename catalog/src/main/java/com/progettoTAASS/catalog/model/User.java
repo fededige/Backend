@@ -14,4 +14,11 @@ public class User {
 
     @Column(name = "email")
     private String email;
+
+    public String toString() {
+        return "User [" +
+            "\n\tid=" + id +
+            "\n\tusername=" + username +
+            "\n\temail=" + email + "]";
+    }
 }
