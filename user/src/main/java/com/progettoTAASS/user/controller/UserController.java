@@ -1,16 +1,12 @@
 package com.progettoTAASS.user.controller;
 
-import com.progettoTAASS.user.enums.BookUserTypesEnum;
-import com.progettoTAASS.user.model.Book;
-import com.progettoTAASS.user.model.BookUser;
+import com.progettoTAASS.user.model.Reservation;
 import com.progettoTAASS.user.model.User;
-import com.progettoTAASS.user.repository.BookUserRepository;
+import com.progettoTAASS.user.repository.ReservationRepository;
 import com.progettoTAASS.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,33 +17,42 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
-    private BookUserRepository bookUserRepository;
+    private ReservationRepository reservationRepository;
 
     @GetMapping("/{id}")
-    public User getUserInfos(@PathVariable int id) {
+    public ResponseEntity<User> getUserInfos(@PathVariable int id) {
         User currentUser = userRepository.findDistinctFirstById(id);
 
-        return currentUser;
+        return ResponseEntity.ok(currentUser);
+    }
+
+    @PostMapping("/insert")
+    public ResponseEntity<User> insertNewUser(@RequestBody User newUser) {
+        User u = userRepository.save(newUser);
+
+        return ResponseEntity.ok(u);
     }
 
     @GetMapping("/{id}/coins")
-    public int getUserCoins(@PathVariable int id) {
+    public ResponseEntity<Integer> getUserCoins(@PathVariable int id) {
         User currentUser = userRepository.findDistinctFirstById(id);
+        if(currentUser == null)
+            return ResponseEntity.notFound().build();
 
-        return currentUser.getWallet().getCoins();
+        return ResponseEntity.ok(currentUser.getWallet().getCoins());
     }
 
     @GetMapping("/{id}/read")
-    private List<BookUser> getBooksRead(@PathVariable int id) {
-        List<BookUser> listBookRead = bookUserRepository.findBookUserByUserIdAndType(id, BookUserTypesEnum.LETTO);
+    private ResponseEntity<List<Reservation>> getBooksRead(@PathVariable int id) {
+        List<Reservation> listBookRead = reservationRepository.findReservationByUserReservationId(id);
 
-        return listBookRead;
+        return ResponseEntity.ok(listBookRead);
     }
 
     @GetMapping("/{id}/loan")
-    private List<BookUser> getBooksLoan(@PathVariable int id) {
-        List<BookUser> listBookLoan = bookUserRepository.findBookUserByUserIdAndType(id, BookUserTypesEnum.PRESTATO);
+    private ResponseEntity<List<Reservation>> getBooksLoan(@PathVariable int id) {
+        List<Reservation> listBookLoan = reservationRepository.findReservationByOwnerId(id);
 
-        return listBookLoan;
+        return ResponseEntity.ok(listBookLoan);
     }
 }
