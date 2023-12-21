@@ -15,11 +15,13 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
 
     public Wallet getWallet() {
         return wallet;
     }
+
+    public void setWallet(Wallet wallet) { this.wallet = wallet; }
 }

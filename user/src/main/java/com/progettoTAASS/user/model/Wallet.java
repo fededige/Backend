@@ -12,6 +12,8 @@ public class Wallet {
     @Column(name = "coins")
     private int coins;
 
+    public int getId() { return this.id; }
+
     public int getCoins() {
         return coins;
     }

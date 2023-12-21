@@ -29,4 +29,8 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "user_reservetion_id", nullable = false)
     private User userReservation;
+
+    public int getId() {
+        return id;
+    }
 }
