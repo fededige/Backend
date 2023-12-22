@@ -1,7 +1,13 @@
 package com.progettoTAASS.catalog.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "user")
 public class User {
@@ -12,13 +18,9 @@ public class User {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "email")
-    private String email;
-
     public String toString() {
         return "User [" +
             "\n\tid=" + id +
-            "\n\tusername=" + username +
-            "\n\temail=" + email + "]";
+            "\n\tusername=" + username + "]";
     }
 }

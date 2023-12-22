@@ -5,26 +5,29 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.progettoTAASS.catalog.enums.BookConditionsEnum;
 import com.progettoTAASS.catalog.enums.BookGenresEnum;
 import com.progettoTAASS.catalog.enums.BookLoanDurationsEnum;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 import java.util.Date;
 
-@Indexed
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "book")
 public class Book {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @FullTextField()
     @Column(name = "title")
     private String title;
 
-    @FullTextField()
     @Column(name = "author")
     private String author;
 
@@ -35,6 +38,7 @@ public class Book {
     @Column(name = "genre")
     private BookGenresEnum genre;
 
+    @Nullable
     @Column(name = "cover")
     private byte[] cover;
 
@@ -53,7 +57,13 @@ public class Book {
     private String publisher;
 
     @Column(name = "loan_duration")
-    private BookLoanDurationsEnum loan_duration;
+    private BookLoanDurationsEnum loanDuration;
+
+    @Column(name = "times_read")
+    private int timesRead;
+
+    @Column(name = "times_read_this_month")
+    private int timesReadThisMonth;
 
     public String toString() {
         return "Book [" +
@@ -63,11 +73,12 @@ public class Book {
             "\n\tpublishingDate=" + publishingDate +
             "\n\tplot= \n\t\"" + plot + "\"\n" + 
             "\n\towner=" + owner +
-            "\n\tloan_duration=" + loan_duration +
+            "\n\ttimesRead=" + timesRead +
+            "\n\tloan_duration=" + loanDuration +
             "\n\tpublisher=" + publisher + "]";
     }
 
-//    public int getId() {
-//        return id;
-//    }
+    public void setId(int id) {
+        this.id = id;
+    }
 }
