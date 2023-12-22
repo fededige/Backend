@@ -15,13 +15,30 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @OneToOne
-    @JoinColumn(name = "wallet_id", nullable = false)
-    private Wallet wallet;
+    @Column(name = "coins")
+    private int coins;
 
-    public Wallet getWallet() {
-        return wallet;
+    public User(String username, String email) {
+        this.username = username;
+        this.email = email;
     }
 
-    public void setWallet(Wallet wallet) { this.wallet = wallet; }
+    public User() {}
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public int getCoins() {
+        return this.coins;
+    }
+
+    public void setCoins(int coins) { this.coins = coins; }
+
+    @Override
+    public String toString() { return "id: " + this.id + " - email: " + this.email + " - username: " + this.username + " - coins: " + this.coins; }
 }

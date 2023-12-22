@@ -4,7 +4,6 @@ import com.progettoTAASS.user.model.*;
 import com.progettoTAASS.user.repository.ReservationRepository;
 import com.progettoTAASS.user.repository.ReviewRepository;
 import com.progettoTAASS.user.repository.UserRepository;
-import com.progettoTAASS.user.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,54 +22,55 @@ public class UserController {
     @Autowired
     private ReviewRepository reviewRepository;
 
-    @Autowired
-    private WalletRepository walletRepository;
-
     @GetMapping("/")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = (List<User>)userRepository.findAll();
+        System.out.println(users);
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserInfos(@PathVariable int id) {
-        User currentUser = userRepository.findDistinctFirstById(id);
+        User currentUser = userRepository.findUserById(id);
 
         return ResponseEntity.ok(currentUser);
     }
 
     @PostMapping("/insert")
     public ResponseEntity<User> insertNewUser(@RequestBody User newUser) {
-        Wallet w = newUser.getWallet();
-        walletRepository.save(w);
-        User u = userRepository.save(newUser);
+        User u = userRepository.save(new User(newUser.getUsername(), newUser.getEmail()));
 
         return ResponseEntity.ok(u);
     }
 
-    @GetMapping("/{id}/coins")
-    public ResponseEntity<Integer> getUserCoins(@PathVariable int id) {
-        User currentUser = userRepository.findDistinctFirstById(id);
-        if(currentUser == null)
-            return ResponseEntity.notFound().build();
+    // 405: METHOD NOT ALLOWED (?)
+    @DeleteMapping("/delete")
+    public ResponseEntity<Integer> deleteUser(@RequestBody User u) {
+        userRepository.delete(u);
 
-        return ResponseEntity.ok(currentUser.getWallet().getCoins());
+        return ResponseEntity.ok(1);
     }
 
-    @PostMapping("/{id}/coins/add")
-    public ResponseEntity<Wallet> addUserCoins(@PathVariable int id, @RequestBody int coins) {
-        User currentUser = userRepository.findDistinctFirstById(id);
+    @GetMapping("/{id}/coins")
+    public ResponseEntity<Integer> getUserCoins(@PathVariable int id) {
+        User currentUser = userRepository.findUserById(id);
         if(currentUser == null)
             return ResponseEntity.notFound().build();
 
-        Wallet w = walletRepository.findWalletById(currentUser.getWallet().getId());
+        return ResponseEntity.ok(currentUser.getCoins());
+    }
 
-        w.setCoins(w.getCoins() + coins);
+    // Potrebbe essere gestito da un microservizio a parte
+    @PostMapping("/{id}/coins/add")
+    public ResponseEntity<User> addUserCoins(@PathVariable int id, @RequestBody int coins) {
+        User currentUser = userRepository.findUserById(id);
+        if(currentUser == null)
+            return ResponseEntity.notFound().build();
 
-        Wallet savedWallet = walletRepository.save(w);
-        currentUser.setWallet(savedWallet);
+        currentUser.setCoins(coins);
+        User savedUser = userRepository.save(currentUser);
 
-        return ResponseEntity.ok(savedWallet);
+        return ResponseEntity.ok(savedUser);
     }
 
     @GetMapping("/{id}/read")
