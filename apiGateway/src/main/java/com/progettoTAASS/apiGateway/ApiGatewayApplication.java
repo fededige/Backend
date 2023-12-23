@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class ApiGatewayApplication {
+
+	@Value("${user_microservice_url}")
+	private String user_microservice_url;
 	@Value("${catalog_microservice_url}")
 	private String catalog_microservice_url;
 
@@ -23,6 +26,10 @@ public class ApiGatewayApplication {
 						.path("/catalog/**")
 						.filters(f -> f.rewritePath("/catalog/(?<segment>.*)", "/${segment}"))
 						.uri(catalog_microservice_url))
+				.route( p -> p
+						.path("/user/**")
+						.filters(f -> f.rewritePath("/user/(?<segment>.*)", "/${segment}"))
+						.uri(user_microservice_url))
 				.build();
 	}
 }

@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.progettoTAASS</groupId>
-	<artifactId>catalog</artifactId>
+	<artifactId>user</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>catalog</name>
-	<description>Demo project for Spring Boot</description>
+	<name>user</name>
+	<description>user microservice</description>
 	<properties>
 		<java.version>21</java.version>
 	</properties>

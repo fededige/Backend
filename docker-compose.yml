@@ -26,6 +26,8 @@ services:
     networks:
       - project-network
     environment:
+      - USER_HOST=user
+      - USER_PORT=8080
       - CATALOG_HOST=catalog
       - CATALOG_PORT=8080
 
@@ -45,7 +47,7 @@ services:
         target: /data
         volume:
           nocopy: true
-
+  
   catalog:
     build: catalog/.
     image: project-catalog
@@ -59,11 +61,43 @@ services:
       - rabbitmq
     networks:
       - project-network
+          
+  db-user:
+    container_name: db-user
+    image: "postgres"
+    networks:
+      - project-network
+    environment:
+      POSTGRES_DB: project-user
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: data-db-user
+        target: /data
+        volume:
+          nocopy: true
+
+  user:
+    build: user/.
+    image: project-user
+    container_name: prog-user_c
+    environment:
+      POSTGRES_DB_HOST: db-user
+      API_GATEWAY_HOST: api-gateway
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - db-user
+      - rabbitmq
+    networks:
+      - project-network
 
 networks:
   project-network:
 
 volumes:
+  data-db-user:
   data-rabbitmq:
   data-db-catalog:
 
