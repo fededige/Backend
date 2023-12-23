@@ -65,6 +65,10 @@ public class Book {
     @Column(name = "times_read_this_month")
     private int timesReadThisMonth;
 
+    @Column(name = "available")
+    private boolean available;
+
+
     public String toString() {
         return "Book [" +
             "\n\tid=" + id +
@@ -75,6 +79,7 @@ public class Book {
             "\n\towner=" + owner +
             "\n\ttimesRead=" + timesRead +
             "\n\tloan_duration=" + loanDuration +
+            "\n\tavailable=" + available +
             "\n\tpublisher=" + publisher + "]";
     }
 
