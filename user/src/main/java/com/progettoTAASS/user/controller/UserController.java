@@ -22,6 +22,9 @@ public class UserController {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private UserSender userSender;
+
     @GetMapping("/")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = (List<User>)userRepository.findAll();
@@ -39,6 +42,7 @@ public class UserController {
     @PostMapping("/insert")
     public ResponseEntity<User> insertNewUser(@RequestBody User newUser) {
         User u = userRepository.save(newUser);
+        userSender.sendNewUser(u);
 
         return ResponseEntity.ok(u);
     }
@@ -48,6 +52,7 @@ public class UserController {
     public ResponseEntity<User> deleteUser(@PathVariable int id) {
         User userToDelete = userRepository.findUserById(id);
         userRepository.delete(userToDelete);
+        userSender.sendNewUser(userToDelete);
 
         return ResponseEntity.ok(userToDelete);
     }
