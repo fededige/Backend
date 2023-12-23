@@ -25,12 +25,47 @@ services:
       - rabbitmq
     networks:
       - project-network
+    environment:
+      - CATALOG_HOST=catalog
+      - CATALOG_PORT=8080
+
+  db-catalog:
+    container_name: db-catalog
+    image: "postgres"
+    networks:
+      - project-network
+    environment:
+      POSTGRES_DB: project-catalog
+      POSTGRES_USER: catalog
+      POSTGRES_PASSWORD: catalog
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: data-db-catalog
+        target: /data
+        volume:
+          nocopy: true
+
+  catalog:
+    build: catalog/.
+    image: project-catalog
+    container_name: prog-catalog_c
+    environment:
+      POSTGRES_DB_HOST: db-catalog
+      API_GATEWAY_HOST: api-gateway
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - db-catalog
+      - rabbitmq
+    networks:
+      - project-network
 
 networks:
   project-network:
 
 volumes:
   data-rabbitmq:
+  data-db-catalog:
 
 
 # docker-compose build && docker-compose up

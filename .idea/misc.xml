@@ -7,6 +7,7 @@
         <option value="$PROJECT_DIR$/book/pom.xml" />
         <option value="$PROJECT_DIR$/apiGateway/pom.xml" />
         <option value="$PROJECT_DIR$/author/pom.xml" />
+        <option value="$PROJECT_DIR$/catalog/pom.xml" />
       </list>
     </option>
     <option name="workspaceImportForciblyTurnedOn" value="true" />
