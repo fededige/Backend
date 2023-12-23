@@ -57,7 +57,7 @@ public class CatalogRestController {
 
 
 
-    private static final int LIMIT = 50;
+    private static final int LIMIT = 10;
 
     //TODO: REMOVE THIS, JUST FOR TESTING
     @GetMapping("/getAllBook")
