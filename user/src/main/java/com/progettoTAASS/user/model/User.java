@@ -1,7 +1,13 @@
 package com.progettoTAASS.user.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "user")
 public class User {
@@ -17,27 +23,6 @@ public class User {
 
     @Column(name = "coins")
     private int coins;
-
-    public User(String username, String email) {
-        this.username = username;
-        this.email = email;
-    }
-
-    public User() {}
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public int getCoins() {
-        return this.coins;
-    }
-
-    public void setCoins(int coins) { this.coins = coins; }
 
     @Override
     public String toString() { return "id: " + this.id + " - email: " + this.email + " - username: " + this.username + " - coins: " + this.coins; }

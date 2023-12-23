@@ -38,17 +38,18 @@ public class UserController {
 
     @PostMapping("/insert")
     public ResponseEntity<User> insertNewUser(@RequestBody User newUser) {
-        User u = userRepository.save(new User(newUser.getUsername(), newUser.getEmail()));
+        User u = userRepository.save(newUser);
 
         return ResponseEntity.ok(u);
     }
 
     // 405: METHOD NOT ALLOWED (?)
-    @DeleteMapping("/delete")
-    public ResponseEntity<Integer> deleteUser(@RequestBody User u) {
-        userRepository.delete(u);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<User> deleteUser(@PathVariable int id) {
+        User userToDelete = userRepository.findUserById(id);
+        userRepository.delete(userToDelete);
 
-        return ResponseEntity.ok(1);
+        return ResponseEntity.ok(userToDelete);
     }
 
     @GetMapping("/{id}/coins")
@@ -89,7 +90,7 @@ public class UserController {
 
     @GetMapping("/{id}/review/wrote")
     public ResponseEntity<List<Review>> getReviewWrote(@PathVariable int id) {
-        List<Review> reviewWrote = reviewRepository.findReviewByReservationId(id);
+        List<Review> reviewWrote = reviewRepository.findReviewByWriterId(id);
 
         return ResponseEntity.ok(reviewWrote);
     }

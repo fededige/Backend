@@ -2,9 +2,15 @@ package com.progettoTAASS.user.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "reservation")
 public class Reservation {
@@ -30,7 +36,4 @@ public class Reservation {
     @JoinColumn(name = "user_reservetion_id", nullable = false)
     private User userReservation;
 
-    public int getId() {
-        return id;
-    }
 }
