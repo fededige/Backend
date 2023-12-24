@@ -2,6 +2,10 @@ package com.progettoTAASS.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.progettoTAASS.user.model.User;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +28,12 @@ public class UserSender {
         private String routingkey;
 
         public void sendNewUser(User user) {
-            ObjectMapper o = new ObjectMapper();
-            String userJson = "";
+            ObjectMapper objectMapper = new ObjectMapper();
             try {
-                userJson = o.writeValueAsString(user);
-                System.out.println(userJson);
+                ObjectNode rootNode = objectMapper.createObjectNode();
+                rootNode.put("username", user.getUsername());
+                String userJson = objectMapper.writeValueAsString(rootNode);
+
                 rabbitTemplate.convertAndSend(exchange,routingkey, userJson);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);

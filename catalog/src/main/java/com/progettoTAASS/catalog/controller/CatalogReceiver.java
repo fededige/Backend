@@ -1,5 +1,6 @@
 package com.progettoTAASS.catalog.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.progettoTAASS.catalog.model.User;
 import com.progettoTAASS.catalog.repository.UserRepository;
@@ -22,11 +23,20 @@ public class CatalogReceiver {
     @RabbitListener(queues = "${spring.rabbitmq.template.default-receive-queue}")
     public void receivedMessage(@Payload String message) {
         ObjectMapper o = new ObjectMapper();
-        System.out.println("\nmessaggio non convertito: " + message);
-        String username = (message.split("me\":\"")[1]).split("\",\"e")[0];
-        System.out.println("\n\nusername from split: " + username + "\n");
-        User receivedUser = new User(username);
+        User receivedUser = null;
+        try {
+            receivedUser = o.readValue(message, User.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println("\nutente inserito" + receivedUser);
-        userRepository.save(receivedUser);
+
+        User checkExistingUser = userRepository.findUserByUsername(receivedUser.getUsername());
+        System.out.println("\ncheckExistingUser: " + checkExistingUser);
+        if (checkExistingUser != null){
+            userRepository.delete(checkExistingUser);
+        } else {
+            userRepository.save(receivedUser);
+        }
     }
 }
