@@ -20,7 +20,7 @@ public class CatalogReceiver {
         this.userRepository = userRepository;
     }
 
-    @RabbitListener(queues = "${spring.rabbitmq.template.default-receive-queue}")
+    @RabbitListener(queues = "userQueue")
     public void receivedMessage(@Payload String message) {
         ObjectMapper o = new ObjectMapper();
         User receivedUser = null;
