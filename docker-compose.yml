@@ -30,6 +30,8 @@ services:
       - USER_PORT=8080
       - CATALOG_HOST=catalog
       - CATALOG_PORT=8080
+      - RESERVATION_HOST=reservation
+      - RESERVATION_PORT=8080
 
   db-catalog:
     container_name: db-catalog
@@ -93,13 +95,46 @@ services:
     networks:
       - project-network
 
+  db-reservation:
+    container_name: db-reservation
+    image: "postgres"
+    networks:
+      - project-network
+    environment:
+      POSTGRES_DB: project-reservation
+      POSTGRES_USER: reservation
+      POSTGRES_PASSWORD: reservation
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: data-db-reservation
+        target: /data
+        volume:
+          nocopy: true
+
+  reservation:
+    build: reservation/.
+    image: project-reservation
+    container_name: prog-reservation_c
+    environment:
+      POSTGRES_DB_HOST: db-reservation
+      API_GATEWAY_HOST: api-gateway
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - db-reservation
+      - rabbitmq
+    networks:
+      - project-network
+
+
 networks:
   project-network:
 
 volumes:
   data-db-user:
-  data-rabbitmq:
   data-db-catalog:
+  data-db-reservation:
+  data-rabbitmq:
 
 
 # docker-compose build && docker-compose up
