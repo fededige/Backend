@@ -18,6 +18,10 @@ public class User {
     @Column(name = "username")
     private String username;
 
+    public User(String username) {
+        this.username = username;
+    }
+
     public String toString() {
         return "User [" +
             "\n\tid=" + id +
