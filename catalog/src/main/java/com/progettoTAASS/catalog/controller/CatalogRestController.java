@@ -26,7 +26,7 @@ public class CatalogRestController {
 //    JUST FOR TESTING - REMOVE
 
     //TODO: REMOVE THIS, JUST FOR TESTING
-    @GetMapping("/getAllUser")
+    @GetMapping("/getAllUsers")
     public ResponseEntity<List<User>> getAllUser(){
         List<User> users = userRepository.findAll();
         return !users.isEmpty() ? ResponseEntity.ok(users) : ResponseEntity.notFound().build();

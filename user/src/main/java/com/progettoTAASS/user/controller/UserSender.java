@@ -18,20 +18,31 @@ public class UserSender {
             this.rabbitTemplate = rabbitTemplate;
         }
 
-        @Value("${spring.rabbitmq.template.exchange}")
+//        @Value("${spring.rabbitmq.template.exchange}")
+//        private String exchange;
+//
+//        @Value("${spring.rabbitmq.template.routingkey}")
+//        private String routingkey;
+
+        @Value("${rabbitmq.exchange.name}")
         private String exchange;
 
-        @Value("${spring.rabbitmq.template.routingkey}")
-        private String routingkey;
+        @Value("${rabbitmq.routing.catalog.key}")
+        private String routingCatalogKey;
+
+        @Value("${rabbitmq.routing.reservation.key}")
+        private String routingReservationKey;
 
         public void sendNewUser(User user) {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 ObjectNode rootNode = objectMapper.createObjectNode();
                 rootNode.put("username", user.getUsername());
+                rootNode.put("email", user.getEmail());
                 String userJson = objectMapper.writeValueAsString(rootNode);
 
-                rabbitTemplate.convertAndSend(exchange,routingkey, userJson);
+                rabbitTemplate.convertAndSend(exchange, routingCatalogKey, userJson);
+                rabbitTemplate.convertAndSend(exchange, routingReservationKey, userJson);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
