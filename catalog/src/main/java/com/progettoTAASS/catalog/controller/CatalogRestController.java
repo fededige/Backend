@@ -21,6 +21,8 @@ public class CatalogRestController {
     private BookRepository bookRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CatalogSender catalogSender;
 
     //==========================================================
 //    JUST FOR TESTING - REMOVE
@@ -60,7 +62,7 @@ public class CatalogRestController {
     private static final int LIMIT = 10;
 
     //TODO: REMOVE THIS, JUST FOR TESTING
-    @GetMapping("/getAllBook")
+    @GetMapping("/getAllBooks")
     public ResponseEntity<List<Book>> getAllBook(){
         List<Book> books = bookRepository.findAll();
         return !books.isEmpty() ? ResponseEntity.ok(books) : ResponseEntity.notFound().build();
@@ -114,22 +116,24 @@ public class CatalogRestController {
 
 
     /**
-     * This method saves a book in DB. TODO: menage rabbitMq
+     * This method saves a book in DB.
      * @return ResponseEntity< Book >
      */
     @PostMapping(value = "/insert", consumes = "application/json")
     public ResponseEntity<Book> saveBook(@RequestBody Book book){
         Book savedBook = bookRepository.save(book);
+        catalogSender.sendBook(book);
         return ResponseEntity.ok(savedBook);
     }
 
     /**
-     * This method removes a book from DB. TODO: menage rabbitMq
+     * This method removes a book from DB.
      */
     @DeleteMapping("/remove/{id}")
     public void removeBook(@PathVariable int id) {
         Book bookToRemove = bookRepository.findById(id);
         bookRepository.delete(bookToRemove);
+        catalogSender.sendBook(bookToRemove);
     }
 
 }

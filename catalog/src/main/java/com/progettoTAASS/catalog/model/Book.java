@@ -2,6 +2,11 @@ package com.progettoTAASS.catalog.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.progettoTAASS.catalog.enums.BookConditionsEnum;
 import com.progettoTAASS.catalog.enums.BookGenresEnum;
 import com.progettoTAASS.catalog.enums.BookLoanDurationsEnum;
@@ -31,7 +36,7 @@ public class Book {
     @Column(name = "author")
     private String author;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "publishing_date")
     private Date publishingDate;
 
