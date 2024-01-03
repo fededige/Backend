@@ -11,28 +11,15 @@ import org.springframework.amqp.core.*;
 
 @Configuration
 public class RabbitMqConfig {
-//    @Value("${spring.rabbitmq.host}")
-//    String host;
-//
-//    @Value("${spring.rabbitmq.username}")
-//    String username;
-//
-//    @Value("${spring.rabbitmq.password}")
-//    String password;
-
-//    @Bean
-//    CachingConnectionFactory connectionFactory() {
-//        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(host);
-//        cachingConnectionFactory.setUsername(username);
-//        cachingConnectionFactory.setPassword(password);
-//        return cachingConnectionFactory;
-//    }
 
     @Value("${rabbitmq.queue.catalog.name}")
     private String catalogQueue;
 
     @Value("${rabbitmq.queue.reservation.name}")
     private String reservationQueue;
+
+    @Value("${rabbitmq.queue.reservationUser.name}")
+    private String reservationUserQueue;
 
     @Value("${rabbitmq.exchange.name}")
     private String exchange;
@@ -43,6 +30,9 @@ public class RabbitMqConfig {
     @Value("${rabbitmq.routing.reservation.key}")
     private String routingReservationKey;
 
+    @Value("${rabbitmq.routing.reservationUser.key}")
+    private String routingReservationUserKey;
+
     @Bean
     public Queue catalogQueue(){
         return new Queue(catalogQueue);
@@ -51,6 +41,11 @@ public class RabbitMqConfig {
     @Bean
     public Queue reservationQueue(){
         return new Queue(reservationQueue);
+    }
+
+    @Bean
+    public Queue reservationUserQueue(){
+        return new Queue(reservationUserQueue);
     }
 
     @Bean
@@ -72,6 +67,14 @@ public class RabbitMqConfig {
                 .bind(reservationQueue())
                 .to(exchange())
                 .with(routingReservationKey);
+    }
+
+    @Bean
+    public Binding reservationUserBinding(){
+        return BindingBuilder
+                .bind(reservationUserQueue())
+                .to(exchange())
+                .with(routingReservationUserKey);
     }
 
     @Bean

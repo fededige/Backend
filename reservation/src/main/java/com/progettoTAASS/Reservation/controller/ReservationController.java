@@ -70,12 +70,14 @@ public class ReservationController {
 //        bookRepository.save(book);
 
         newReservation.setDate(dateTimeNow());
+        System.out.println("dateTimeNow(): " + newReservation.getDate());
         newReservation.setBook(book);
         System.out.println("\n  newReservation with new Date: " + newReservation);
         Reservation savedReservation = reservationRepository.save(newReservation);
         System.out.println("\n  savedReservation with new Date: " + savedReservation);
 
         reservationSender.sendUpdatedBook(savedReservation.getBook());
+        reservationSender.sendNewReservation(savedReservation);
         return ResponseEntity.ok(Reservation.serializeReservation(savedReservation));
     }
 

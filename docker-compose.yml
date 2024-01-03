@@ -15,6 +15,25 @@ services:
         source: data-rabbitmq
         target: /var/lib/rabbitmq
 
+#  pgadmin:
+#    container_name: pgadmin_container
+#    image: dpage/pgadmin4
+#    restart: always
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+#      PGADMIN_DEFAULT_PASSWORD: root
+#      PGADMIN_LISTEN_PORT: 50
+#    ports:
+#      - "5050:50"
+#    volumes:
+#      - pgadmin-data:/var/lib/pgadmin
+#    depends_on:
+#      - db-catalog
+#      - db-user
+#      - db-reservation
+#    networks:
+#      - project-network
+
   gateway:
     build: apiGateway/.
     image: project-gateway
@@ -135,6 +154,7 @@ volumes:
   data-db-catalog:
   data-db-reservation:
   data-rabbitmq:
+  pgadmin-data:
 
 
 # docker-compose build && docker-compose up

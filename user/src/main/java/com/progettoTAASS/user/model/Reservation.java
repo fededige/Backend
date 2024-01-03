@@ -24,7 +24,6 @@ public class Reservation {
     @Column(name = "author")
     private String author;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @Column(name = "date")
     private Date date;
 
@@ -36,4 +35,11 @@ public class Reservation {
     @JoinColumn(name = "user_reservetion_id", nullable = false)
     private User userReservation;
 
+    public Reservation(String title, String author, User owner, Date date, User userReservation) {
+        this.title = title;
+        this.author = author;
+        this.owner = owner;
+        this.date = date;
+        this.userReservation = userReservation;
+    }
 }

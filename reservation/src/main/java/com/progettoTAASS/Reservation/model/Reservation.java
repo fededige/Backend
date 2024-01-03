@@ -26,7 +26,7 @@ import java.util.Date;
         @GeneratedValue(strategy = GenerationType.AUTO)
         private int id;
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+//        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         @Column(name = "date")
         private Date date;
 
@@ -53,6 +53,7 @@ import java.util.Date;
         ObjectNode tree = objectMapper.valueToTree(newRes);
         tree.put("book", objectMapper.valueToTree(Book.serializeBook(newRes.getBook())));
         tree.put("reservationUser", objectMapper.valueToTree(newRes.getReservationUser()));
+        tree.put("date", newRes.getDate().toString());
         try {
             return objectMapper.writeValueAsString(tree);
         } catch (JsonProcessingException e) {

@@ -79,6 +79,13 @@ public class UserController {
         return ResponseEntity.ok(savedUser);
     }
 
+    @GetMapping("/getAllReservations")
+    public ResponseEntity<List<Reservation>> getAllReservations() {
+        List<Reservation> allReservation = (List<Reservation>) reservationRepository.findAll();
+
+        return ResponseEntity.ok(allReservation);
+    }
+
     @GetMapping("/{id}/read")
     public ResponseEntity<List<Reservation>> getBooksRead(@PathVariable int id) {
         List<Reservation> listBookRead = reservationRepository.findReservationByUserReservationId(id);
@@ -112,4 +119,6 @@ public class UserController {
 
         return ResponseEntity.ok(reviewReceived);
     }
+
+
 }
