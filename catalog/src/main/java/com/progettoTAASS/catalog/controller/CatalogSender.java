@@ -30,7 +30,7 @@ public class CatalogSender {
                 ObjectNode rootNode = objectMapper.createObjectNode();
                 rootNode.put("title", book.getTitle());
                 rootNode.put("author", book.getAuthor());
-                rootNode.put("publishingDate", String.valueOf(book.getPublishingDate()));
+                rootNode.put("publishingDate", book.getPublishingDate().toString());
                 rootNode.put("available", book.isAvailable());
                 rootNode.put("owner", objectMapper.valueToTree(book.getOwner()));
                 String bookJson = objectMapper.writeValueAsString(rootNode);

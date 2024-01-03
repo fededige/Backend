@@ -1,6 +1,7 @@
 package com.progettoTAASS.Reservation.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.progettoTAASS.Reservation.model.Book;
 import com.progettoTAASS.Reservation.model.User;
@@ -11,6 +12,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Component
 @EnableRabbit
@@ -49,18 +55,45 @@ public class ReservationReceiver {
     @RabbitListener(queues = "${rabbitmq.queue.catalogReservation.name}")
     public void receiveBook(@Payload String message) {
         ObjectMapper o = new ObjectMapper();
-        System.out.println("receiveBook message: " + message);
-        Book bookReceived;
+        // convert message received to jsonNode
+        JsonNode messageObj;
         try {
-            bookReceived = o.readValue(message, Book.class);
+             messageObj = o.readTree(message);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("bookReceived: " + bookReceived);
-        System.out.println("bookReceived.getTitle()" + bookReceived.getTitle());
-        System.out.println("bookReceived.getOwner()" + bookReceived.getOwner());
+
+        String title = messageObj.get("title").textValue();
+        String author = messageObj.get("author").textValue();
+        boolean av = messageObj.get("available").asBoolean();
+
+        User owner;
+        Date date;
+        String dDate = messageObj.get("publishingDate").textValue();
+        DateFormat df;
+        if (Character.isDigit(dDate.charAt(0))){ // check date input format (if it starts with a number then if in yyyy-MM-dd format
+             df = new SimpleDateFormat("yyyy-MM-dd");
+        }
+        else {
+            df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+        }
+
+        try {
+            owner = o.readValue(messageObj.get("owner").toString(), User.class);
+            date = df.parse(dDate);
+        } catch (JsonProcessingException | ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        Book bookReceived = new Book();
+        bookReceived.setTitle(title);
+        bookReceived.setAuthor(author);
+        bookReceived.setAvailable(av);
+        bookReceived.setOwner(owner);
+        bookReceived.setPublishingDate(date);
+
         Book checkExistingBook = bookRepository.findAllByAuthorAndPublishingDateAndTitle(bookReceived.getAuthor(), bookReceived.getPublishingDate(), bookReceived.getTitle());
-        System.out.println("\ncheckExistingBook: " + checkExistingBook);
+        System.out.println("checkExistingBook" + checkExistingBook);
         if (checkExistingBook != null){
             bookRepository.delete(checkExistingBook);
         } else {
