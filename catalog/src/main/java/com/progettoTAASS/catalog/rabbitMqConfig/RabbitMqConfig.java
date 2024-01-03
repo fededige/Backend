@@ -1,5 +1,4 @@
 package com.progettoTAASS.catalog.rabbitMqConfig;
-
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -11,22 +10,6 @@ import org.springframework.amqp.core.*;
 
 @Configuration
 public class RabbitMqConfig {
-//    @Value("${spring.rabbitmq.host}")
-//    String host;
-//
-//    @Value("${spring.rabbitmq.username}")
-//    String username;
-//
-//    @Value("${spring.rabbitmq.password}")
-//    String password;
-
-//    @Bean
-//    CachingConnectionFactory connectionFactory() {
-//        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(host);
-//        cachingConnectionFactory.setUsername(username);
-//        cachingConnectionFactory.setPassword(password);
-//        return cachingConnectionFactory;
-//    }
 
     @Value("${rabbitmq.queue.catalog.name}")
     private String catalogQueue;
@@ -36,6 +19,9 @@ public class RabbitMqConfig {
 
     @Value("${rabbitmq.queue.catalogReservation.name}")
     private String catalogReservationQueue;
+
+    @Value("${rabbitmq.queue.reservationCatalog.name}")
+    private String reservationCatalogQueue;
 
     @Value("${rabbitmq.exchange.name}")
     private String exchange;
@@ -48,6 +34,9 @@ public class RabbitMqConfig {
 
     @Value("${rabbitmq.routing.catalogReservation.key}")
     private String routingCatalogReservationKey;
+
+    @Value("${rabbitmq.routing.reservationCatalog.key}")
+    private String routingReservationCatalogKey;
 
     @Bean
     public Queue catalogQueue(){
@@ -62,6 +51,11 @@ public class RabbitMqConfig {
     @Bean
     public Queue catalogReservationQueue(){
         return new Queue(catalogReservationQueue);
+    }
+
+    @Bean
+    public Queue reservationCatalogQueue(){
+        return new Queue(reservationCatalogQueue);
     }
 
     @Bean
@@ -84,13 +78,20 @@ public class RabbitMqConfig {
                 .to(exchange())
                 .with(routingReservationKey);
     }
-
     @Bean
     public Binding catalogReservationBinding(){
         return BindingBuilder
                 .bind(catalogReservationQueue())
                 .to(exchange())
                 .with(routingCatalogReservationKey);
+    }
+
+    @Bean
+    public Binding reservationCatalogBinding(){
+        return BindingBuilder
+                .bind(reservationCatalogQueue())
+                .to(exchange())
+                .with(routingReservationCatalogKey);
     }
 
     @Bean

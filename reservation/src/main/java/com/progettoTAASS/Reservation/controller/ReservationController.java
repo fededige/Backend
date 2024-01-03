@@ -32,6 +32,9 @@ public class ReservationController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ReservationSender reservationSender;
+
     /* Book is returned
         and becomes available again*/
     @PutMapping("/BookAvailable/{id}")
@@ -41,7 +44,9 @@ public class ReservationController {
         book.setAvailable(true);
         //bookRepository.save(book)
         reservation.setBook(book);
-        reservationRepository.save(reservation);
+        Reservation updatedReservation = reservationRepository.save(reservation);
+        reservationSender.sendUpdatedBook(reservation.getBook());
+        System.out.println("updatedReservation" + updatedReservation);
         return ResponseEntity.ok(Book.serializeBook(book));
     }
 
@@ -62,13 +67,16 @@ public class ReservationController {
         System.out.println("\n  newReservation: " + newReservation);
         Book book = bookRepository.findById(newReservation.getBook().getId());
         book.setAvailable(false);
-        //bookRepository.save(book)
+//        bookRepository.save(book);
 
         newReservation.setDate(dateTimeNow());
+        newReservation.setBook(book);
         System.out.println("\n  newReservation with new Date: " + newReservation);
-        Reservation newRes = reservationRepository.save(newReservation);
-        System.out.println("\n  newRes with new Date: " + newRes);
-        return ResponseEntity.ok(Reservation.serializeReservation(newRes));
+        Reservation savedReservation = reservationRepository.save(newReservation);
+        System.out.println("\n  savedReservation with new Date: " + savedReservation);
+
+        reservationSender.sendUpdatedBook(savedReservation.getBook());
+        return ResponseEntity.ok(Reservation.serializeReservation(savedReservation));
     }
 
     private Date dateTimeNow(){
