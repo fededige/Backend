@@ -89,10 +89,10 @@ public class ReservationReceiver {
         bookReceived.setTitle(title);
         bookReceived.setAuthor(author);
         bookReceived.setAvailable(av);
-        bookReceived.setOwner(owner);
+        bookReceived.setOwner(userRepository.findUserByUsername(owner.getUsername()));
         bookReceived.setPublishingDate(date);
 
-        Book checkExistingBook = bookRepository.findAllByAuthorAndPublishingDateAndTitle(bookReceived.getAuthor(), bookReceived.getPublishingDate(), bookReceived.getTitle());
+        Book checkExistingBook = bookRepository.findAllByAuthorAndPublishingDateAndTitleAndOwner(bookReceived.getAuthor(), bookReceived.getPublishingDate(), bookReceived.getTitle(), bookReceived.getOwner());
         System.out.println("checkExistingBook" + checkExistingBook);
         if (checkExistingBook != null){
             bookRepository.delete(checkExistingBook);

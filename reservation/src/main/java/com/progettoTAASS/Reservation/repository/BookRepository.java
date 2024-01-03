@@ -9,6 +9,6 @@ import java.util.Date;
 public interface BookRepository extends JpaRepository <Book, Integer> {
 
     Book findById(int id);
-    Book findAllByAuthorAndPublishingDateAndTitle(String author, Date publishingDate, String title);
+    Book findAllByAuthorAndPublishingDateAndTitleAndOwner(String author, Date publishingDate, String title, User owner);
 }
 

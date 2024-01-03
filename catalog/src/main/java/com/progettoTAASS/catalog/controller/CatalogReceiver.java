@@ -20,28 +20,8 @@ public class CatalogReceiver {
         this.userRepository = userRepository;
     }
 
-//    @RabbitListener(queues = "userQueue")
-//    public void receivedMessage(@Payload String message) {
-//        ObjectMapper o = new ObjectMapper();
-//        User receivedUser = null;
-//        try {
-//            receivedUser = o.readValue(message, User.class);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//        System.out.println("\nutente inserito" + receivedUser);
-//
-//        User checkExistingUser = userRepository.findUserByUsername(receivedUser.getUsername());
-//        System.out.println("\ncheckExistingUser: " + checkExistingUser);
-//        if (checkExistingUser != null){
-//            userRepository.delete(checkExistingUser);
-//        } else {
-//            userRepository.save(receivedUser);
-//        }
-//    }
-
     @RabbitListener(queues = "${rabbitmq.queue.catalog.name}")
-    public void receivedMessage(@Payload String message) {
+    public void receiveUser(@Payload String message) {
         ObjectMapper o = new ObjectMapper();
         System.out.println("CatalogReceiver message: " + message);
         User userReceived;

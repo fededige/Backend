@@ -102,8 +102,16 @@ public class ReservationController {
     public ResponseEntity<String> getBook(@RequestBody JsonNode requestBody){
         ObjectMapper objectMapper = new ObjectMapper();
         Book book;
+        User user;
+        System.out.println("requestBody" + requestBody);
+        System.out.println("owner form json: " + requestBody.get("owner").toString());
+
         try {
-            book = bookRepository.findAllByAuthorAndPublishingDateAndTitle(requestBody.get("author").textValue() , objectMapper.readValue(requestBody.get("publishingDate").toString(), Date.class), requestBody.get("title").textValue());
+            user = objectMapper.readValue(requestBody.get("owner").toString(), User.class);
+            System.out.println("owner form json after convertion: " + user);
+
+//            book = bookRepository.findAllByAuthorAndPublishingDateAndTitle(requestBody.get("author").textValue() , objectMapper.readValue(requestBody.get("publishingDate").toString(), Date.class), requestBody.get("title").textValue());
+            book = bookRepository.findAllByAuthorAndPublishingDateAndTitleAndOwner(requestBody.get("author").textValue() , objectMapper.readValue(requestBody.get("publishingDate").toString(), Date.class), requestBody.get("title").textValue(), objectMapper.readValue(requestBody.get("owner").toString(), User.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -128,6 +136,7 @@ public class ReservationController {
 
     @PostMapping("/insert")
     public ResponseEntity<String> saveBook(@RequestBody Book book){
+        book.setOwner(userRepository.findUserByUsername(book.getOwner().getUsername()));
         Book savedBook = bookRepository.save(book);
         return ResponseEntity.ok(Book.serializeBook(savedBook));
     }
