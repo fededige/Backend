@@ -153,7 +153,7 @@ public class ReservationController {
 
     @GetMapping("/getAllBooks")
     public ResponseEntity<List<String>> getAllBooks(){
-        List<Book> books = bookRepository.findAll();
+        List<Book> books = (List<Book>) bookRepository.findAll();
         List<String> booksJson = new ArrayList<>();
         for (Book b : books){
             booksJson.add(Book.serializeBook(b));

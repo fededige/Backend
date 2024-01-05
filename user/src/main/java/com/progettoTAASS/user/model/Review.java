@@ -27,15 +27,14 @@ public class Review {
     @Column(name = "evaluation")
     private int evaluation;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @Column(name = "date")
-    private Date published;
+    private Date datePublished;
 
     @ManyToOne
     @JoinColumn(name = "writer_id", nullable = false)
     private User writer;
 
     @ManyToOne
-    @JoinColumn(name = "book_id", nullable = false)
+    @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 }
