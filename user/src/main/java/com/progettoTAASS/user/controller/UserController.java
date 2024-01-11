@@ -1,8 +1,6 @@
 package com.progettoTAASS.user.controller;
 
 import com.progettoTAASS.user.model.*;
-import com.progettoTAASS.user.repository.ReservationRepository;
-import com.progettoTAASS.user.repository.ReviewRepository;
 import com.progettoTAASS.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +13,6 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private ReviewRepository reviewRepository;
 
     @Autowired
     private UserSender userSender;
