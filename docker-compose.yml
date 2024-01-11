@@ -51,6 +51,8 @@ services:
       - CATALOG_PORT=8080
       - RESERVATION_HOST=reservation
       - RESERVATION_PORT=8080
+      - REVIEW_HOST=review
+      - REVIEW_PORT=8080
 
   db-catalog:
     container_name: db-catalog
@@ -145,6 +147,37 @@ services:
     networks:
       - project-network
 
+  db-review:
+    container_name: db-review
+    image: "postgres"
+    networks:
+      - project-network
+    environment:
+      POSTGRES_DB: project-review
+      POSTGRES_USER: review
+      POSTGRES_PASSWORD: review
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: data-db-review
+        target: /data
+        volume:
+          nocopy: true
+
+  review:
+    build: review/.
+    image: project-review
+    container_name: prog-review_c
+    environment:
+      POSTGRES_DB_HOST: db-review
+      API_GATEWAY_HOST: api-gateway
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - db-review
+      - rabbitmq
+    networks:
+      - project-network
+
 
 networks:
   project-network:
@@ -153,6 +186,7 @@ volumes:
   data-db-user:
   data-db-catalog:
   data-db-reservation:
+  data-db-review:
   data-rabbitmq:
   pgadmin-data:
 

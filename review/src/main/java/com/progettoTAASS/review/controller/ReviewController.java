@@ -6,11 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.progettoTAASS.review.model.Reservation;
 import com.progettoTAASS.review.model.Review;
 import com.progettoTAASS.review.model.User;
+import com.progettoTAASS.review.repository.ReservationRepository;
 import com.progettoTAASS.review.repository.ReviewRepository;
+import com.progettoTAASS.review.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +23,11 @@ import java.util.List;
 public class ReviewController {
     @Autowired
     private ReviewRepository reviewRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+
 
     @PostMapping(value = "/writeReview", consumes = "application/json")
     public ResponseEntity<String> writeReview(@RequestBody JsonNode requestBody){
@@ -27,23 +36,41 @@ public class ReviewController {
         String title = requestBody.get("title").textValue();
         int evaluation =  requestBody.get("evaluation").intValue();
         String text = requestBody.get("text").textValue();
-        Date datePublished;
-        User writer;
-        Reservation reservation;
+        String writerUsername = requestBody.get("writerUsername").textValue();
+        Date dateReservation;
+        String usernameUserReservation = requestBody.get("usernameUserReservation").textValue();
 
         try {
-            datePublished = objectMapper.readValue(requestBody.get("datePublished").toString(), Date.class);
-            writer = objectMapper.readValue(requestBody.get("writer").toString(), User.class);
-            reservation = objectMapper.readValue(requestBody.get("reservation").toString(), Reservation.class);
+            dateReservation = objectMapper.readValue(requestBody.get("dateReservation").toString(), Date.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+
+        User writer = userRepository.findByUsername(writerUsername);
+        User userReservation = userRepository.findByUsername(usernameUserReservation);
+
+        if (writer == null || userReservation == null){
+            System.out.println("writer or userReservation == null");
+            return ResponseEntity.notFound().build();
+        }
+
+        Reservation reservation = reservationRepository.findByDateAndUserReservation(dateReservation, userReservation);
+
+        if (reservation == null){
+            System.out.println("reservation == null");
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!writer.getUsername().equals(reservation.getUserReservation().getUsername())){
+            System.out.println("writer user != reservation user");
+            return ResponseEntity.notFound().build();
         }
 
         Review newReview = new Review();
         newReview.setTitle(title);
         newReview.setEvaluation(evaluation);
         newReview.setText(text);
-        newReview.setDatePublished(datePublished);
+        newReview.setDatePublished(dateTimeNow());
         newReview.setWriter(writer);
         newReview.setReservation(reservation);
 
@@ -52,11 +79,65 @@ public class ReviewController {
         return ResponseEntity.ok(Review.serializeReview(reviewSaved));
     }
 
+    private Date dateTimeNow(){
+        return java.sql.Timestamp.valueOf(LocalDateTime.now(ZoneId.of("Europe/Rome")));
+    }
 
-    @PostMapping(value = "/deleteReview", consumes = "application/json")
+
+    @DeleteMapping(value = "/deleteReview", consumes = "application/json")
     public ResponseEntity<String> deleteReview(@RequestBody JsonNode requestBody){
-        //TODO
-        return ResponseEntity.ok("todo");
+        System.out.println("requestBody: " + requestBody);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Date datePublished;
+        String writerUsername = requestBody.get("writerUsername").textValue();
+        try {
+            datePublished = objectMapper.readValue(requestBody.get("datePublishedReview").toString(), Date.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        User writer = userRepository.findByUsername(writerUsername);
+
+        if (writer == null){
+            System.out.println("writer == null");
+            return ResponseEntity.notFound().build();
+        }
+
+        Review existingReview = reviewRepository.findByDatePublishedAndWriter(datePublished, writer);
+        if (existingReview != null){
+            reviewRepository.delete(existingReview);
+        }
+        return existingReview != null ? ResponseEntity.ok(Review.serializeReview(existingReview)) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/getAllReview")
+    public ResponseEntity<List<Review>> getAllResview(){
+        List<Review> review = (List<Review>) reviewRepository.findAll();
+        return !review.isEmpty() ? ResponseEntity.ok(review) : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/insertUser")
+    public ResponseEntity<User> saveUser(@RequestBody User user){
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.ok(savedUser);
+    }
+
+    @GetMapping("/getAllUsers")
+    public ResponseEntity<List<User>> getAllUsers(){
+        List<User> users = (List<User>) userRepository.findAll();
+        return !users.isEmpty() ? ResponseEntity.ok(users) : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/insertReservation")
+    public ResponseEntity<Reservation> saveReservation(@RequestBody Reservation reservation){
+        Reservation savedReservation = reservationRepository.save(reservation);
+        return ResponseEntity.ok(savedReservation);
+    }
+
+    @GetMapping("/getAllReservations")
+    public ResponseEntity<List<Reservation>> getAllReservations(){
+        List<Reservation> reservations = (List<Reservation>) reservationRepository.findAll();
+        return !reservations.isEmpty() ? ResponseEntity.ok(reservations) : ResponseEntity.notFound().build();
     }
 
 }

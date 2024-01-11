@@ -16,6 +16,8 @@ public class ApiGatewayApplication {
 	private String catalog_microservice_url;
 	@Value("${reservation_microservice_url}")
 	private String reservation_microservice_url;
+	@Value("${review_microservice_url}")
+	private String review_microservice_url;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ApiGatewayApplication.class, args);
@@ -36,6 +38,10 @@ public class ApiGatewayApplication {
 						.path("/reservation/**")
 						.filters(f -> f.rewritePath("/reservation/(?<segment>.*)", "/${segment}"))
 						.uri(reservation_microservice_url))
+				.route( p -> p
+						.path("/review/**")
+						.filters(f -> f.rewritePath("/review/(?<segment>.*)", "/${segment}"))
+						.uri(review_microservice_url))
 				.build();
 	}
 }
