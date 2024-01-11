@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface ReviewRepository extends CrudRepository<Review, Integer> {
     Review findByDatePublishedAndWriter(Date date, User writer);
+    List<Review> findAllByWriter(User writer);
+    List<Review> findAllByReservation_Owner(User writer);
 }

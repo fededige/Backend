@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -111,10 +112,45 @@ public class ReviewController {
     }
 
     @GetMapping("/getAllReview")
-    public ResponseEntity<List<Review>> getAllResview(){
+    public ResponseEntity<List<Review>> getAllReview(){
         List<Review> review = (List<Review>) reviewRepository.findAll();
         return !review.isEmpty() ? ResponseEntity.ok(review) : ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/getReviewWrote/{username}")
+    public ResponseEntity<List<String>> getReviewWrote(@PathVariable String username) {
+        User currentUser = userRepository.findByUsername(username);
+        if (currentUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Review> listReview = reviewRepository.findAllByWriter(currentUser);
+
+        List<String> serializableList = new ArrayList<>();
+        for (Review review : listReview) {
+            serializableList.add(Review.serializeReview(review));
+        }
+        return ResponseEntity.ok(serializableList);
+    }
+
+    @GetMapping("/getReviewReceived/{username}")
+    public ResponseEntity<List<String>> getReviewReceived(@PathVariable String username) {
+        User currentUser = userRepository.findByUsername(username);
+        if (currentUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Review> listReview = reviewRepository.findAllByReservation_Owner(currentUser);
+
+        List<String> serializableList = new ArrayList<>();
+        for (Review review : listReview) {
+            serializableList.add(Review.serializeReview(review));
+        }
+        return ResponseEntity.ok(serializableList);
+    }
+
+
+
+
+//    methods for testing
 
     @PostMapping("/insertUser")
     public ResponseEntity<User> saveUser(@RequestBody User user){

@@ -128,6 +128,36 @@ public class ReservationController {
         return book != null ? ResponseEntity.ok(Book.serializeBook(book)) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/getReservationsBorrowed/{username}")
+    public ResponseEntity<List<String>> getReservationsBorrowed(@PathVariable String username) {
+        User currentUser = userRepository.findUserByUsername(username);
+        if (currentUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Reservation> listReservation = reservationRepository.findAllByReservationUser(currentUser);
+
+        List<String> serializableList = new ArrayList<>();
+        for (Reservation reservation : listReservation) {
+            serializableList.add(Reservation.serializeReservation(reservation));
+        }
+        return ResponseEntity.ok(serializableList);
+    }
+
+    @GetMapping("/getReservationsLend/{username}")
+    public ResponseEntity<List<String>> getReservationsLend(@PathVariable String username) {
+        User currentUser = userRepository.findUserByUsername(username);
+        if (currentUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Reservation> listReservation = reservationRepository.findAllByBook_Owner(currentUser);
+
+        List<String> serializableList = new ArrayList<>();
+        for (Reservation reservation : listReservation) {
+            serializableList.add(Reservation.serializeReservation(reservation));
+        }
+        return ResponseEntity.ok(serializableList);
+    }
+
     /*
     * metodi solo per il testing
     * */

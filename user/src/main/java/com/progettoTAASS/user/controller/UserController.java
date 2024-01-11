@@ -79,46 +79,39 @@ public class UserController {
         return ResponseEntity.ok(savedUser);
     }
 
-    @GetMapping("/getAllReservations")
-    public ResponseEntity<List<Reservation>> getAllReservations() {
-        List<Reservation> allReservation = (List<Reservation>) reservationRepository.findAll();
-
-        return ResponseEntity.ok(allReservation);
-    }
-
-    @GetMapping("/{id}/read")
-    public ResponseEntity<List<Reservation>> getBooksRead(@PathVariable int id) {
-        List<Reservation> listBookRead = reservationRepository.findReservationByUserReservationId(id);
-
-        return ResponseEntity.ok(listBookRead);
-    }
-
-    @GetMapping("/{id}/loan")
-    public ResponseEntity<List<Reservation>> getBooksLoan(@PathVariable int id) {
-        List<Reservation> listBookLoan = reservationRepository.findReservationByOwnerId(id);
-
-        return ResponseEntity.ok(listBookLoan);
-    }
-
-    @GetMapping("/{id}/review/wrote")
-    public ResponseEntity<List<Review>> getReviewWrote(@PathVariable int id) {
-        List<Review> reviewWrote = reviewRepository.findReviewByWriterId(id);
-
-        return ResponseEntity.ok(reviewWrote);
-    }
-
-    @GetMapping("/{id}/review/received")
-    public ResponseEntity<List<Review>> getReviewReceived(@PathVariable int id) {
-        List<Reservation> userBook = reservationRepository.findReservationByOwnerId(id);
-        List<Review> reviewReceived = null;
-        for (Reservation r: userBook) {
-            List<Review> queryResult = reviewRepository.findReviewByReservationId(r.getId());
-            if(queryResult != null)
-                reviewReceived.addAll(queryResult);
-        }
-
-        return ResponseEntity.ok(reviewReceived);
-    }
+//    @GetMapping("/{id}/read")
+//    public ResponseEntity<List<Reservation>> getBooksRead(@PathVariable int id) {
+//        List<Reservation> listBookRead = reservationRepository.findReservationByUserReservationId(id);
+//
+//        return ResponseEntity.ok(listBookRead);
+//    }
+//
+//    @GetMapping("/{id}/loan")
+//    public ResponseEntity<List<Reservation>> getBooksLoan(@PathVariable int id) {
+//        List<Reservation> listBookLoan = reservationRepository.findReservationByOwnerId(id);
+//
+//        return ResponseEntity.ok(listBookLoan);
+//    }
+//
+//    @GetMapping("/{id}/review/wrote")
+//    public ResponseEntity<List<Review>> getReviewWrote(@PathVariable int id) {
+//        List<Review> reviewWrote = reviewRepository.findReviewByWriterId(id);
+//
+//        return ResponseEntity.ok(reviewWrote);
+//    }
+//
+//    @GetMapping("/{id}/review/received")
+//    public ResponseEntity<List<Review>> getReviewReceived(@PathVariable int id) {
+//        List<Reservation> userBook = reservationRepository.findReservationByOwnerId(id);
+//        List<Review> reviewReceived = null;
+//        for (Reservation r: userBook) {
+//            List<Review> queryResult = reviewRepository.findReviewByReservationId(r.getId());
+//            if(queryResult != null)
+//                reviewReceived.addAll(queryResult);
+//        }
+//
+//        return ResponseEntity.ok(reviewReceived);
+//    }
 
 
 }
