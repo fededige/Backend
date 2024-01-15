@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserSender {
-        private final RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-        @Autowired
-        public UserSender(RabbitTemplate rabbitTemplate) {
-            this.rabbitTemplate = rabbitTemplate;
-        }
+    @Autowired
+    public UserSender(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
 //        @Value("${spring.rabbitmq.template.exchange}")
 //        private String exchange;
@@ -24,28 +24,32 @@ public class UserSender {
 //        @Value("${spring.rabbitmq.template.routingkey}")
 //        private String routingkey;
 
-        @Value("${rabbitmq.exchange.name}")
-        private String exchange;
+    @Value("${rabbitmq.exchange.name}")
+    private String exchange;
 
-        @Value("${rabbitmq.routing.catalog.key}")
-        private String routingCatalogKey;
+    @Value("${rabbitmq.routing.catalog.key}")
+    private String routingCatalogKey;
 
-        @Value("${rabbitmq.routing.reservation.key}")
-        private String routingReservationKey;
+    @Value("${rabbitmq.routing.reservation.key}")
+    private String routingReservationKey;
 
-        public void sendNewUser(User user) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                ObjectNode rootNode = objectMapper.createObjectNode();
-                rootNode.put("username", user.getUsername());
-                rootNode.put("email", user.getEmail());
-                String userJson = objectMapper.writeValueAsString(rootNode);
+    @Value("${rabbitmq.routing.reviewUser.key}")
+    private String routingReviewUserKey;
 
-                rabbitTemplate.convertAndSend(exchange, routingCatalogKey, userJson);
-                rabbitTemplate.convertAndSend(exchange, routingReservationKey, userJson);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+    public void sendNewUser(User user) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            ObjectNode rootNode = objectMapper.createObjectNode();
+            rootNode.put("username", user.getUsername());
+            rootNode.put("email", user.getEmail());
+            String userJson = objectMapper.writeValueAsString(rootNode);
+
+            rabbitTemplate.convertAndSend(exchange, routingCatalogKey, userJson);
+            rabbitTemplate.convertAndSend(exchange, routingReservationKey, userJson);
+            rabbitTemplate.convertAndSend(exchange, routingReviewUserKey, userJson);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
+    }
 
 }

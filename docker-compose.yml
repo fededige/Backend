@@ -110,6 +110,7 @@ services:
       POSTGRES_DB_HOST: db-user
       API_GATEWAY_HOST: api-gateway
       RABBITMQ_HOST: rabbitmq
+#      REVIEW_HOST: review
     depends_on:
       - db-user
       - rabbitmq
@@ -172,6 +173,7 @@ services:
       POSTGRES_DB_HOST: db-review
       API_GATEWAY_HOST: api-gateway
       RABBITMQ_HOST: rabbitmq
+#      USER_HOST: user
     depends_on:
       - db-review
       - rabbitmq

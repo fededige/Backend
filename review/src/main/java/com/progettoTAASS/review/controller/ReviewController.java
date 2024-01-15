@@ -10,6 +10,7 @@ import com.progettoTAASS.review.repository.ReservationRepository;
 import com.progettoTAASS.review.repository.ReviewRepository;
 import com.progettoTAASS.review.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -152,8 +153,9 @@ public class ReviewController {
 
 //    methods for testing
 
-    @PostMapping("/insertUser")
+    @PostMapping(value = "/insertUser", consumes = "application/json")
     public ResponseEntity<User> saveUser(@RequestBody User user){
+        System.out.println(user);
         User savedUser = userRepository.save(user);
         return ResponseEntity.ok(savedUser);
     }

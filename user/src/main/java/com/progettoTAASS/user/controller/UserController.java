@@ -1,11 +1,20 @@
 package com.progettoTAASS.user.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.progettoTAASS.user.model.*;
 import com.progettoTAASS.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -16,6 +25,9 @@ public class UserController {
 
     @Autowired
     private UserSender userSender;
+
+//    @Value("${review_url}")
+//    private String review_url;
 
     @GetMapping("/")
     public ResponseEntity<List<User>> getAllUsers() {
@@ -36,6 +48,31 @@ public class UserController {
         User u = userRepository.save(newUser);
         userSender.sendNewUser(u);
 
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        ObjectNode rootNode = objectMapper.createObjectNode();
+//        rootNode.put("username", u.getUsername());
+//        rootNode.put("email", u.getEmail());
+//        String userJson;
+//        try {
+//            userJson = objectMapper.writeValueAsString(rootNode);
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
+//        RestTemplate restTemplate = new RestTemplate();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        HttpEntity<User> request = null;
+//        ResponseEntity<User> response = null;
+//        try{
+//            request = new HttpEntity<>(u, headers);
+//            response = restTemplate.postForEntity("http://" + review_url + "/review/insertUser", request, User.class);
+//            System.out.println(" [x] Sent '" + rootNode + "'");
+//        } catch (Exception e){
+//            System.out.println("http://" + review_url + "/review/insertUser");
+//            System.out.println(request);
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().build();
+//        }
         return ResponseEntity.ok(u);
     }
 
