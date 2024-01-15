@@ -26,8 +26,10 @@ public class ReservationSender {
     @Value("${rabbitmq.routing.reservationCatalog.key}")
     private String routingReservationCatalogKey;
 
-    @Value("${rabbitmq.routing.reservationUser.key}")
-    private String routingReservationUserKey;
+    @Value("${rabbitmq.routing.reviewReservation.key}")
+    private String routingReviewReservationKey;
+
+
 
     public void sendUpdatedBook(Book book) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -57,7 +59,8 @@ public class ReservationSender {
             rootNode.put("userReservation", objectMapper.valueToTree(reservation.getReservationUser()));
             String reservationJson = objectMapper.writeValueAsString(rootNode);
 
-            rabbitTemplate.convertAndSend(exchange, routingReservationUserKey, reservationJson);
+//            rabbitTemplate.convertAndSend(exchange, routingReservationUserKey, reservationJson);
+            rabbitTemplate.convertAndSend(exchange, routingReviewReservationKey, reservationJson);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
