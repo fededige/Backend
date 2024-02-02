@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -61,11 +62,14 @@ public class CatalogController {
 
     private static final int LIMIT = 10;
 
-    //TODO: REMOVE THIS, JUST FOR TESTING
     @GetMapping("/getAllBooks")
-    public ResponseEntity<List<Book>> getAllBook(){
+    public ResponseEntity<List<String>> getAllBook(){
         List<Book> books = bookRepository.findAll();
-        return !books.isEmpty() ? ResponseEntity.ok(books) : ResponseEntity.notFound().build();
+        List<String> ret = new ArrayList<>();
+        for (Book book : books){
+            ret.add(Book.serializeBook(book));
+        }
+        return !books.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
     }
 
     /**
@@ -74,9 +78,9 @@ public class CatalogController {
      * @return Book
      */
     @GetMapping("/getBook/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable int id){
+    public ResponseEntity<String> getBookById(@PathVariable int id){
         Book book = bookRepository.findById(id);
-        return book != null ? ResponseEntity.ok(book) : ResponseEntity.notFound().build();
+        return book != null ? ResponseEntity.ok(Book.serializeBook(book)) : ResponseEntity.notFound().build();
     }
 
     /**
@@ -84,10 +88,14 @@ public class CatalogController {
      * @param owner_id the owner id
      * @return ResponseEntity< List<Book> >
      */
-    @GetMapping("/getBookByOwner/{owner}")
-    public ResponseEntity<List<Book>> getBooksByOwner(@PathVariable int owner_id){
+    @GetMapping("/getBookByOwner/{owner_id}")
+    public ResponseEntity<List<String>> getBooksByOwner(@PathVariable int owner_id){
         List<Book> books = bookRepository.findByOwner(userRepository.findById(owner_id));
-        return !books.isEmpty() ? ResponseEntity.ok(books) : ResponseEntity.notFound().build();
+        List<String> ret = new ArrayList<>();
+        for (Book book : books){
+            ret.add(Book.serializeBook(book));
+        }
+        return !books.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
     }
 
     /**
@@ -95,11 +103,15 @@ public class CatalogController {
      * @return ResponseEntity< List<Book> >
      */
     @GetMapping("/getBestsellers")
-    public ResponseEntity<List<Book>> getMostReadEver(){
-        Page<Book> mostRead = bookRepository.findAll(PageRequest.of(0, LIMIT, Sort.by(Sort.Order.asc("timesRead"))));
+    public ResponseEntity<List<String>> getMostReadEver(){
+        Page<Book> mostRead = bookRepository.findAll(PageRequest.of(0, LIMIT, Sort.by(Sort.Order.desc("timesRead"))));
         System.out.println(mostRead);
+        List<String> ret = new ArrayList<>();
+        for (Book book : mostRead){
+            ret.add(Book.serializeBook(book));
+        }
         //se è vuota non serve ritornare una lista vuota
-        return !mostRead.isEmpty() ? ResponseEntity.ok(mostRead.getContent()) : ResponseEntity.notFound().build();
+        return !mostRead.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
     }
 
     /**
@@ -107,11 +119,14 @@ public class CatalogController {
      * @return ResponseEntity< List<Book> >
      */
     @GetMapping("/getMonthTrend")
-    public ResponseEntity<List<Book>> getMostReadThisMonth(){
-        Page<Book> mostReadThisMonth = bookRepository.findAll(PageRequest.of(0, LIMIT, Sort.by(Sort.Order.asc("timesReadThisMonth"))));
-
+    public ResponseEntity<List<String>> getMostReadThisMonth(){
+        Page<Book> mostReadThisMonth = bookRepository.findAll(PageRequest.of(0, LIMIT, Sort.by(Sort.Order.desc("timesReadThisMonth"))));
+        List<String> ret = new ArrayList<>();
+        for (Book book : mostReadThisMonth){
+            ret.add(Book.serializeBook(book));
+        }
         //se è vuota non serve ritornare una lista vuota
-        return !mostReadThisMonth.isEmpty() ? ResponseEntity.ok(mostReadThisMonth.getContent()) : ResponseEntity.notFound().build();
+        return !mostReadThisMonth.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
     }
 
 
@@ -120,10 +135,10 @@ public class CatalogController {
      * @return ResponseEntity< Book >
      */
     @PostMapping(value = "/insert", consumes = "application/json")
-    public ResponseEntity<Book> saveBook(@RequestBody Book book){
+    public ResponseEntity<String> saveBook(@RequestBody Book book){
         Book savedBook = bookRepository.save(book);
         catalogSender.sendBook(book);
-        return ResponseEntity.ok(savedBook);
+        return ResponseEntity.ok(Book.serializeBook(savedBook));
     }
 
     /**

@@ -113,9 +113,13 @@ public class ReviewController {
     }
 
     @GetMapping("/getAllReview")
-    public ResponseEntity<List<Review>> getAllReview(){
-        List<Review> review = (List<Review>) reviewRepository.findAll();
-        return !review.isEmpty() ? ResponseEntity.ok(review) : ResponseEntity.notFound().build();
+    public ResponseEntity<List<String>> getAllReview(){
+        List<Review> reviews = (List<Review>) reviewRepository.findAll();
+        List<String> ret = new ArrayList<>();
+        for (Review review : reviews){
+            ret.add(Review.serializeReview(review));
+        }
+        return !reviews.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/getReviewWrote/{username}")
