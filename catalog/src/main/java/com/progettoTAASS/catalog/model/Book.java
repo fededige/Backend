@@ -88,7 +88,17 @@ public class Book {
             "\n\tpublisher=" + publisher + "]";
     }
 
-//    public void setId(int id) {
-//        this.id = id;
-//    }
+    public static String serializeBook(Book book){
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false);
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        ObjectNode tree = objectMapper.valueToTree(book);
+        tree.put("owner", objectMapper.valueToTree(book.getOwner()));
+        try {
+            return objectMapper.writeValueAsString(tree);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

@@ -85,7 +85,12 @@ public class CatalogReceiver {
         Book bookToUpdate = bookRepository.findAllByAuthorAndPublishingDateAndTitleAndOwner(author, date, title, userRepository.findUserByUsername(owner.getUsername()));
 
         if (bookToUpdate != null){
-            bookToUpdate.setAvailable(messageObj.get("available").asBoolean());
+            boolean isAvailable = messageObj.get("available").asBoolean();
+            bookToUpdate.setAvailable(isAvailable);
+            if(!isAvailable){
+                bookToUpdate.setTimesRead(bookToUpdate.getTimesRead() + 1);
+                bookToUpdate.setTimesReadThisMonth(bookToUpdate.getTimesReadThisMonth() + 1);
+            }
             Book updatedBook = bookRepository.save(bookToUpdate);
             System.out.println("\nbookToUpdate: " + bookToUpdate);
             System.out.println("\nupdatedBook: " + updatedBook);

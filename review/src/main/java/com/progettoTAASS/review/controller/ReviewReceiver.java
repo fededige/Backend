@@ -90,10 +90,12 @@ public class ReviewReceiver {
             throw new RuntimeException(e);
         }
 
-
-        Reservation newReservation = new Reservation(title, author, owner, date, userReservation);
-
-        reservationRepository.save(newReservation);
-
+        User resOwner = userRepository.findByUsername(owner.getUsername());
+        User resUser = userRepository.findByUsername(userReservation.getUsername());
+        if(resOwner != null && resUser != null) {
+            Reservation newReservation = new Reservation(title, author, resOwner, date, resUser);
+            reservationRepository.save(newReservation);
+        }
+        System.err.println("owner not found in REVIEW DB");
     }
 }
