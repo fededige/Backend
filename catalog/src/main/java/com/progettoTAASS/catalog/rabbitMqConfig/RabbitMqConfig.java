@@ -14,9 +14,6 @@ public class RabbitMqConfig {
     @Value("${rabbitmq.queue.catalog.name}")
     private String catalogQueue;
 
-    @Value("${rabbitmq.queue.reservation.name}")
-    private String reservationQueue;
-
     @Value("${rabbitmq.queue.catalogReservation.name}")
     private String catalogReservationQueue;
 
@@ -29,9 +26,6 @@ public class RabbitMqConfig {
     @Value("${rabbitmq.routing.catalog.key}")
     private String routingCatalogKey;
 
-    @Value("${rabbitmq.routing.reservation.key}")
-    private String routingReservationKey;
-
     @Value("${rabbitmq.routing.catalogReservation.key}")
     private String routingCatalogReservationKey;
 
@@ -41,11 +35,6 @@ public class RabbitMqConfig {
     @Bean
     public Queue catalogQueue(){
         return new Queue(catalogQueue);
-    }
-
-    @Bean
-    public Queue reservationQueue(){
-        return new Queue(reservationQueue);
     }
 
     @Bean
@@ -71,13 +60,6 @@ public class RabbitMqConfig {
                 .with(routingCatalogKey);
     }
 
-    @Bean
-    public Binding reservationBinding(){
-        return BindingBuilder
-                .bind(reservationQueue())
-                .to(exchange())
-                .with(routingReservationKey);
-    }
     @Bean
     public Binding catalogReservationBinding(){
         return BindingBuilder

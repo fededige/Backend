@@ -11,9 +11,6 @@ import org.springframework.amqp.core.*;
 @Configuration
 public class RabbitMqConfig {
 
-    @Value("${rabbitmq.queue.catalog.name}")
-    private String catalogQueue;
-
     @Value("${rabbitmq.queue.reservation.name}")
     private String reservationQueue;
 
@@ -23,17 +20,11 @@ public class RabbitMqConfig {
     @Value("${rabbitmq.queue.reservationCatalog.name}")
     private String reservationCatalogQueue;
 
-    @Value("${rabbitmq.queue.reservationUser.name}")
-    private String reservationUserQueue;
-
     @Value("${rabbitmq.queue.reviewReservation.name}")
     private String reviewReservationQueue;
 
     @Value("${rabbitmq.exchange.name}")
     private String exchange;
-
-    @Value("${rabbitmq.routing.catalog.key}")
-    private String routingCatalogKey;
 
     @Value("${rabbitmq.routing.reservation.key}")
     private String routingReservationKey;
@@ -44,17 +35,9 @@ public class RabbitMqConfig {
     @Value("${rabbitmq.routing.reservationCatalog.key}")
     private String routingReservationCatalogKey;
 
-    @Value("${rabbitmq.routing.reservationUser.key}")
-    private String routingReservationUserKey;
-
     @Value("${rabbitmq.routing.reviewReservation.key}")
     private String routingReviewReservationKey;
 
-
-    @Bean
-    public Queue catalogQueue(){
-        return new Queue(catalogQueue);
-    }
 
     @Bean
     public Queue reservationQueue(){
@@ -72,11 +55,6 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public Queue reservationUserQueue(){
-        return new Queue(reservationUserQueue);
-    }
-
-    @Bean
     public Queue reviewReservationQueue(){
         return new Queue(reviewReservationQueue);
     }
@@ -85,14 +63,6 @@ public class RabbitMqConfig {
     @Bean
     public TopicExchange exchange(){
         return new TopicExchange(exchange);
-    }
-
-    @Bean
-    public Binding catalogBinding(){
-        return BindingBuilder
-                .bind(catalogQueue())
-                .to(exchange())
-                .with(routingCatalogKey);
     }
 
     @Bean
@@ -119,22 +89,12 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public Binding reservationUserBinding(){
-        return BindingBuilder
-                .bind(reservationUserQueue())
-                .to(exchange())
-                .with(routingReservationUserKey);
-    }
-    @Bean
     public Binding reviewReservationBinding(){
         return BindingBuilder
                 .bind(reviewReservationQueue())
                 .to(exchange())
                 .with(routingReviewReservationKey);
     }
-
-
-
 
     @Bean
     public MessageConverter converter(){

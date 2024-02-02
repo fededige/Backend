@@ -18,9 +18,6 @@ public class RabbitMqConfig {
     @Value("${rabbitmq.queue.reservation.name}")
     private String reservationQueue;
 
-    @Value("${rabbitmq.queue.reservationUser.name}")
-    private String reservationUserQueue;
-
     @Value("${rabbitmq.queue.reviewUser.name}")
     private String reviewUserQueue;
 
@@ -33,9 +30,6 @@ public class RabbitMqConfig {
     @Value("${rabbitmq.routing.reservation.key}")
     private String routingReservationKey;
 
-    @Value("${rabbitmq.routing.reservationUser.key}")
-    private String routingReservationUserKey;
-
     @Value("${rabbitmq.routing.reviewUser.key}")
     private String routingReviewUserKey;
 
@@ -47,11 +41,6 @@ public class RabbitMqConfig {
     @Bean
     public Queue reservationQueue(){
         return new Queue(reservationQueue);
-    }
-
-    @Bean
-    public Queue reservationUserQueue(){
-        return new Queue(reservationUserQueue);
     }
 
     @Bean
@@ -78,14 +67,6 @@ public class RabbitMqConfig {
                 .bind(reservationQueue())
                 .to(exchange())
                 .with(routingReservationKey);
-    }
-
-    @Bean
-    public Binding reservationUserBinding(){
-        return BindingBuilder
-                .bind(reservationUserQueue())
-                .to(exchange())
-                .with(routingReservationUserKey);
     }
 
     @Bean
