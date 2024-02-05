@@ -136,6 +136,14 @@ public class CatalogController {
      */
     @PostMapping(value = "/insert", consumes = "application/json")
     public ResponseEntity<String> saveBook(@RequestBody Book book){
+        book.setTimesRead(0);
+        book.setTimesReadThisMonth(0);
+        book.setAvailable(true);
+        book.setOwner(userRepository.findUserByUsername(book.getOwner().getUsername()));
+        if(book.getPlot() != null){
+            book.setPlot(book.getPlot().length() < 2040 ? book.getPlot() : book.getPlot().substring(0, 2040));
+        }
+
         Book savedBook = bookRepository.save(book);
         catalogSender.sendBook(book);
         return ResponseEntity.ok(Book.serializeBook(savedBook));

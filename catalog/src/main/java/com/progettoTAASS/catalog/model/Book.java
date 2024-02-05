@@ -40,14 +40,16 @@ public class Book {
     @Column(name = "publishing_date")
     private Date publishingDate;
 
+    @Nullable
     @Column(name = "genre")
     private BookGenresEnum genre;
 
     @Nullable
-    @Column(name = "cover")
-    private byte[] cover;
+    @Column(name = "cover", columnDefinition="text")
+    private String cover;
 
-    @Column(name = "plot")
+    @Nullable
+    @Column(name = "plot", length = 2048)
     private String plot;
 
     @JsonBackReference
@@ -58,6 +60,7 @@ public class Book {
     @Column(name = "condition")
     private BookConditionsEnum condition;
 
+    @Nullable
     @Column(name = "publisher")
     private String publisher;
 
