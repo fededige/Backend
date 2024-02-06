@@ -6,6 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @SpringBootApplication
 public class ApiGatewayApplication {
@@ -42,5 +48,20 @@ public class ApiGatewayApplication {
 						.filters(f -> f.rewritePath("/review/(?<segment>.*)", "/${segment}"))
 						.uri(review_microservice_url))
 				.build();
+	}
+
+	@Bean
+	CorsWebFilter corsWebFilter() {
+		CorsConfiguration corsConfig = new CorsConfiguration();
+		corsConfig.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+		corsConfig.setMaxAge(8000L);
+		corsConfig.addAllowedMethod("*");
+		corsConfig.addAllowedHeader("*");
+
+		UrlBasedCorsConfigurationSource source =
+				new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", corsConfig);
+
+		return new CorsWebFilter(source);
 	}
 }

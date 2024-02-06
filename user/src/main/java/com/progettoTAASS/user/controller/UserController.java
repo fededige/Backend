@@ -17,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 
+//@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
+//@CrossOrigin
 @RestController
 @RequestMapping("/")
 public class UserController {

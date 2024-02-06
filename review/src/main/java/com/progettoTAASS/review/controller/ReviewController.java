@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/")
 public class ReviewController {
