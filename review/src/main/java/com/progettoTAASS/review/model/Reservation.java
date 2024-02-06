@@ -49,15 +49,15 @@ public class Reservation {
 
     public static Object serializeReservation(Reservation reservation) {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false);
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 
         ObjectNode tree = objectMapper.valueToTree(reservation);
         tree.put("owner", objectMapper.valueToTree(reservation.getOwner()));
         tree.put("userReservation", objectMapper.valueToTree(reservation.getUserReservation()));
         tree.put("date", reservation.getDate().toString());
         try {
-            return objectMapper.writeValueAsString(tree);
+            String incorrectJson = objectMapper.writeValueAsString(tree);
+            return incorrectJson.replaceAll(
+                    "(?<=\\{|, ?)([a-zA-Z]+?): ?(?![ \\{\\[])(.+?)(?=,|})", "\"$1\": \"$2\"");
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

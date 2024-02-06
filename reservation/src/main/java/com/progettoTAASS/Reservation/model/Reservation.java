@@ -48,14 +48,14 @@ import java.util.Date;
 
     public static String serializeReservation(Reservation newRes) {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false);
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         ObjectNode tree = objectMapper.valueToTree(newRes);
         tree.put("book", objectMapper.valueToTree(Book.serializeBook(newRes.getBook())));
         tree.put("reservationUser", objectMapper.valueToTree(newRes.getReservationUser()));
         tree.put("date", newRes.getDate().toString());
         try {
-            return objectMapper.writeValueAsString(tree);
+            String incorrectJson = objectMapper.writeValueAsString(tree);
+            return incorrectJson.replaceAll(
+                    "(?<=\\{|, ?)([a-zA-Z]+?): ?(?![ \\{\\[])(.+?)(?=,|})", "\"$1\": \"$2\"");
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
