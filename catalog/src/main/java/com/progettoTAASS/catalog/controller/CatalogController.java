@@ -128,6 +128,25 @@ public class CatalogController {
         return !mostReadThisMonth.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/getBySearchWord")
+    public ResponseEntity<List<String>> getBooksBySearchWord(@RequestParam String search){
+        List<Book> searchByTitle = bookRepository.findByTitleContaining(search);
+        List<Book> searchByAuthor = bookRepository.findByAuthorContaining(search);
+        List<String> ret = new ArrayList<>();
+
+        for(Book book: searchByAuthor){
+            if(!searchByTitle.contains(book)){
+                searchByTitle.add(book);
+            }
+        }
+
+        for (Book book : searchByTitle){
+            ret.add(Book.serializeBook(book));
+        }
+
+        return !searchByTitle.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
+    }
+
 
     /**
      * This method saves a book in DB.
@@ -135,6 +154,7 @@ public class CatalogController {
      */
     @PostMapping(value = "/insert", consumes = "application/json")
     public ResponseEntity<String> saveBook(@RequestBody Book book){
+        System.out.println(book);
         book.setTimesRead(0);
         book.setTimesReadThisMonth(0);
         book.setAvailable(true);
@@ -142,8 +162,9 @@ public class CatalogController {
         if(book.getPlot() != null){
             book.setPlot(book.getPlot().length() < 2040 ? book.getPlot() : book.getPlot().substring(0, 2040));
         }
-
+        System.out.println(book);
         Book savedBook = bookRepository.save(book);
+        System.out.println(savedBook);
         catalogSender.sendBook(book);
         return ResponseEntity.ok(Book.serializeBook(savedBook));
     }
