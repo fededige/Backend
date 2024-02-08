@@ -130,8 +130,8 @@ public class CatalogController {
 
     @GetMapping("/getBySearchWord")
     public ResponseEntity<List<String>> getBooksBySearchWord(@RequestParam String search){
-        List<Book> searchByTitle = bookRepository.findByTitleContaining(search);
-        List<Book> searchByAuthor = bookRepository.findByAuthorContaining(search);
+        List<Book> searchByTitle = bookRepository.findByTitleContainingIgnoreCase(search);
+        List<Book> searchByAuthor = bookRepository.findByAuthorContainingIgnoreCase(search);
         List<String> ret = new ArrayList<>();
 
         for(Book book: searchByAuthor){
@@ -144,7 +144,7 @@ public class CatalogController {
             ret.add(Book.serializeBook(book));
         }
 
-        return !searchByTitle.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ret);
     }
 
 
