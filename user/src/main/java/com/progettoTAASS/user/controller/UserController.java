@@ -47,34 +47,16 @@ public class UserController {
 
     @PostMapping("/insert")
     public ResponseEntity<User> insertNewUser(@RequestBody User newUser) {
-        User u = userRepository.save(newUser);
-        userSender.sendNewUser(u);
+        User checkExistingUser = userRepository.findUserByUsername(newUser.getUsername());
+        User u;
+        if(checkExistingUser == null){
+            u = userRepository.save(newUser);
+            userSender.sendNewUser(u);
+        }
+        else {
+            u = checkExistingUser;
+        }
 
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        ObjectNode rootNode = objectMapper.createObjectNode();
-//        rootNode.put("username", u.getUsername());
-//        rootNode.put("email", u.getEmail());
-//        String userJson;
-//        try {
-//            userJson = objectMapper.writeValueAsString(rootNode);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//        RestTemplate restTemplate = new RestTemplate();
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        HttpEntity<User> request = null;
-//        ResponseEntity<User> response = null;
-//        try{
-//            request = new HttpEntity<>(u, headers);
-//            response = restTemplate.postForEntity("http://" + review_url + "/review/insertUser", request, User.class);
-//            System.out.println(" [x] Sent '" + rootNode + "'");
-//        } catch (Exception e){
-//            System.out.println("http://" + review_url + "/review/insertUser");
-//            System.out.println(request);
-//            e.printStackTrace();
-//            return ResponseEntity.internalServerError().build();
-//        }
         return ResponseEntity.ok(u);
     }
 
@@ -110,39 +92,32 @@ public class UserController {
         return ResponseEntity.ok(savedUser);
     }
 
-//    @GetMapping("/{id}/read")
-//    public ResponseEntity<List<Reservation>> getBooksRead(@PathVariable int id) {
-//        List<Reservation> listBookRead = reservationRepository.findReservationByUserReservationId(id);
-//
-//        return ResponseEntity.ok(listBookRead);
-//    }
-//
-//    @GetMapping("/{id}/loan")
-//    public ResponseEntity<List<Reservation>> getBooksLoan(@PathVariable int id) {
-//        List<Reservation> listBookLoan = reservationRepository.findReservationByOwnerId(id);
-//
-//        return ResponseEntity.ok(listBookLoan);
-//    }
-//
-//    @GetMapping("/{id}/review/wrote")
-//    public ResponseEntity<List<Review>> getReviewWrote(@PathVariable int id) {
-//        List<Review> reviewWrote = reviewRepository.findReviewByWriterId(id);
-//
-//        return ResponseEntity.ok(reviewWrote);
-//    }
-//
-//    @GetMapping("/{id}/review/received")
-//    public ResponseEntity<List<Review>> getReviewReceived(@PathVariable int id) {
-//        List<Reservation> userBook = reservationRepository.findReservationByOwnerId(id);
-//        List<Review> reviewReceived = null;
-//        for (Reservation r: userBook) {
-//            List<Review> queryResult = reviewRepository.findReviewByReservationId(r.getId());
-//            if(queryResult != null)
-//                reviewReceived.addAll(queryResult);
-//        }
-//
-//        return ResponseEntity.ok(reviewReceived);
-//    }
 
+//TODO: http request between user and review
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        ObjectNode rootNode = objectMapper.createObjectNode();
+//        rootNode.put("username", u.getUsername());
+//        rootNode.put("email", u.getEmail());
+//        String userJson;
+//        try {
+//            userJson = objectMapper.writeValueAsString(rootNode);
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
+//        RestTemplate restTemplate = new RestTemplate();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        HttpEntity<User> request = null;
+//        ResponseEntity<User> response = null;
+//        try{
+//            request = new HttpEntity<>(u, headers);
+//            response = restTemplate.postForEntity("http://" + review_url + "/review/insertUser", request, User.class);
+//            System.out.println(" [x] Sent '" + rootNode + "'");
+//        } catch (Exception e){
+//            System.out.println("http://" + review_url + "/review/insertUser");
+//            System.out.println(request);
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().build();
+//        }
 
 }
