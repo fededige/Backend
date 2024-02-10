@@ -50,6 +50,7 @@ public class UserController {
         User checkExistingUser = userRepository.findUserByUsername(newUser.getUsername());
         User u;
         if(checkExistingUser == null){
+            System.out.println(newUser);
             u = userRepository.save(newUser);
             userSender.sendNewUser(u);
         }

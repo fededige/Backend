@@ -54,8 +54,15 @@ import java.util.Date;
         tree.put("date", newRes.getDate().toString());
         try {
             String incorrectJson = objectMapper.writeValueAsString(tree);
-            return incorrectJson.replaceAll(
+            System.out.println(incorrectJson);
+            incorrectJson = incorrectJson.replaceAll(
                     "(?<=\\{|, ?)([a-zA-Z]+?): ?(?![ \\{\\[])(.+?)(?=,|})", "\"$1\": \"$2\"");
+            System.out.println(incorrectJson);
+            incorrectJson = incorrectJson.replace("\\","");
+            System.out.println(incorrectJson);
+            incorrectJson = incorrectJson.replace("\"book\":\"","\"book\":");
+            System.out.println(incorrectJson);
+            return incorrectJson.replace("}\",\"reservationUser\":","},\"reservationUser\":");
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

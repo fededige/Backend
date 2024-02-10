@@ -1,5 +1,6 @@
 package com.progettoTAASS.catalog.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.progettoTAASS.catalog.model.Book;
 import com.progettoTAASS.catalog.model.User;
 import com.progettoTAASS.catalog.repository.BookRepository;
@@ -66,7 +67,9 @@ public class CatalogController {
         List<Book> books = bookRepository.findAll();
         List<String> ret = new ArrayList<>();
         for (Book book : books){
-            ret.add(Book.serializeBook(book));
+            if(book.isAvailable()){
+                ret.add(Book.serializeBook(book));
+            }
         }
         return !books.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
     }
@@ -80,6 +83,12 @@ public class CatalogController {
     public ResponseEntity<String> getBookById(@PathVariable int id){
         Book book = bookRepository.findById(id);
         return book != null ? ResponseEntity.ok(Book.serializeBook(book)) : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping(value = "/getBook", consumes = "application/json")
+    public ResponseEntity<String> getBookByParams(@RequestBody Book book){
+        Book checkBook = bookRepository.findAllByAuthorAndPublishingDateAndTitleAndOwner(book.getAuthor(), book.getPublishingDate(), book.getTitle(), book.getOwner());
+        return checkBook != null ? ResponseEntity.ok(Book.serializeBook(checkBook)) : ResponseEntity.notFound().build();
     }
 
     /**
@@ -107,7 +116,9 @@ public class CatalogController {
         System.out.println(mostRead);
         List<String> ret = new ArrayList<>();
         for (Book book : mostRead){
-            ret.add(Book.serializeBook(book));
+            if(book.isAvailable()){
+                ret.add(Book.serializeBook(book));
+            }
         }
         //se è vuota non serve ritornare una lista vuota
         return !mostRead.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
@@ -122,7 +133,9 @@ public class CatalogController {
         Page<Book> mostReadThisMonth = bookRepository.findAll(PageRequest.of(0, LIMIT, Sort.by(Sort.Order.desc("timesReadThisMonth"))));
         List<String> ret = new ArrayList<>();
         for (Book book : mostReadThisMonth){
-            ret.add(Book.serializeBook(book));
+            if(book.isAvailable()){
+                ret.add(Book.serializeBook(book));
+            }
         }
         //se è vuota non serve ritornare una lista vuota
         return !mostReadThisMonth.isEmpty() ? ResponseEntity.ok(ret) : ResponseEntity.notFound().build();
@@ -141,7 +154,9 @@ public class CatalogController {
         }
 
         for (Book book : searchByTitle){
-            ret.add(Book.serializeBook(book));
+            if(book.isAvailable()){
+                ret.add(Book.serializeBook(book));
+            }
         }
 
         return ResponseEntity.ok(ret);

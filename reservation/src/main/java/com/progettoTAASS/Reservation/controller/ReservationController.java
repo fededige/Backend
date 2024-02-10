@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@CrossOrigin
 @RequestMapping("/")
 @RestController
 public class ReservationController {
@@ -52,18 +51,31 @@ public class ReservationController {
 
     @PostMapping("/reserveBook")
     public ResponseEntity<String> reserveBook(@RequestBody JsonNode requestBody) {
+        System.out.println("requestBody: \n" + requestBody);
         ObjectMapper o = new ObjectMapper();
         Book reservationBook;
         User reservationUser;
         Date reservationDate;
         try {
             reservationBook = o.readValue(requestBody.get("book").toString(), Book.class);
-            reservationUser = o.readValue(requestBody.get("ResevationUser").toString(), User.class);
+            reservationUser = o.readValue(requestBody.get("ReservationUser").toString(), User.class);
             reservationDate = o.readValue(requestBody.get("date").toString(), Date.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        Reservation newReservation = new Reservation(reservationDate, reservationBook, reservationUser);
+        User checkReservationUser = userRepository.findUserByUsername(reservationUser.getUsername());
+        Book checkReservationBook = bookRepository.findAllByAuthorAndPublishingDateAndTitleAndOwner(reservationBook.getAuthor(), reservationBook.getPublishingDate(), reservationBook.getTitle(), reservationBook.getOwner());
+        Reservation newReservation = null;
+        System.out.println("checkReservationUser: \n" + checkReservationUser);
+        System.out.println("checkReservationBook: \n" + checkReservationBook);
+        if(checkReservationUser != null && checkReservationBook != null){
+            System.out.println("checkReservationUser != null && checkReservationBook != null");
+            newReservation = new Reservation(reservationDate, checkReservationBook, checkReservationUser);
+        }
+        else{
+            System.out.println("checkReservationUser == null || checkReservationBook == null");
+            return ResponseEntity.badRequest().build();
+        }
         System.out.println("\n  newReservation: " + newReservation);
         Book book = bookRepository.findById(newReservation.getBook().getId());
         book.setAvailable(false);
@@ -102,8 +114,8 @@ public class ReservationController {
         return reservation != null ? ResponseEntity.ok(Reservation.serializeReservation(reservation)) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/getUser/{username}")
-    public ResponseEntity<User> getUser(@PathVariable String username){
+    @GetMapping("/getUser")
+    public ResponseEntity<User> getUser(@RequestParam String username){
         User user = userRepository.findUserByUsername(username);
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
@@ -128,8 +140,8 @@ public class ReservationController {
         return book != null ? ResponseEntity.ok(Book.serializeBook(book)) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/getReservationsBorrowed/{username}")
-    public ResponseEntity<List<String>> getReservationsBorrowed(@PathVariable String username) {
+    @GetMapping("/getReservationsBorrowed")
+    public ResponseEntity<List<String>> getReservationsBorrowed(@RequestParam String username) {
         User currentUser = userRepository.findUserByUsername(username);
         if (currentUser == null) {
             return ResponseEntity.notFound().build();
@@ -143,8 +155,8 @@ public class ReservationController {
         return ResponseEntity.ok(serializableList);
     }
 
-    @GetMapping("/getReservationsLend/{username}")
-    public ResponseEntity<List<String>> getReservationsLend(@PathVariable String username) {
+    @GetMapping("/getReservationsLend")
+    public ResponseEntity<List<String>> getReservationsLend(@RequestParam String username) {
         User currentUser = userRepository.findUserByUsername(username);
         if (currentUser == null) {
             return ResponseEntity.notFound().build();
