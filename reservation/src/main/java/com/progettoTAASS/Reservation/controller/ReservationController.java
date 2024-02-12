@@ -7,6 +7,7 @@ import com.progettoTAASS.Reservation.model.Reservation;
 import com.progettoTAASS.Reservation.model.User;
 import com.progettoTAASS.Reservation.repository.BookRepository;
 import com.progettoTAASS.Reservation.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import com.progettoTAASS.Reservation.model.Book;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @RequestMapping("/")
 @RestController
@@ -63,33 +65,42 @@ public class ReservationController {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+        System.out.println("reservationBook: \n" + reservationBook);
+        System.out.println("reservationUser: \n" + reservationUser);
         User checkReservationUser = userRepository.findUserByUsername(reservationUser.getUsername());
         Book checkReservationBook = bookRepository.findAllByAuthorAndPublishingDateAndTitleAndOwner(reservationBook.getAuthor(), reservationBook.getPublishingDate(), reservationBook.getTitle(), reservationBook.getOwner());
+
+        if(checkReservationUser.getUsername().equals(checkReservationBook.getOwner().getUsername())){
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("You're trying to borrow your own book");
+        }
+
+        System.out.println("checkReservationUser: \n" + checkReservationUser);
+        System.out.println("checkReservationBook: \n" + checkReservationBook);
         Reservation newReservation = null;
         System.out.println("checkReservationUser: \n" + checkReservationUser);
         System.out.println("checkReservationBook: \n" + checkReservationBook);
-        if(checkReservationUser != null && checkReservationBook != null){
+        if(checkReservationUser != null && checkReservationBook != null && checkReservationUser.getCoins() >= 1){
             System.out.println("checkReservationUser != null && checkReservationBook != null");
             newReservation = new Reservation(reservationDate, checkReservationBook, checkReservationUser);
         }
         else{
-            System.out.println("checkReservationUser == null || checkReservationBook == null");
+            System.out.println("checkReservationUser == null || checkReservationBook == null || checkReservationUser.getCoin() < 1");
             return ResponseEntity.badRequest().build();
         }
         System.out.println("\n  newReservation: " + newReservation);
         Book book = bookRepository.findById(newReservation.getBook().getId());
         book.setAvailable(false);
-//        bookRepository.save(book);
-
         newReservation.setDate(dateTimeNow());
-        System.out.println("dateTimeNow(): " + newReservation.getDate());
         newReservation.setBook(book);
-        System.out.println("\n  newReservation with new Date: " + newReservation);
         Reservation savedReservation = reservationRepository.save(newReservation);
-        System.out.println("\n  savedReservation with new Date: " + savedReservation);
-
+        System.out.println("\n checkReservationUser: " + checkReservationUser);
+        checkReservationUser.setCoins(checkReservationUser.getCoins() - 1);
+        userRepository.save(checkReservationUser);
         reservationSender.sendUpdatedBook(savedReservation.getBook());
         reservationSender.sendNewReservation(savedReservation);
+        reservationSender.sendUpdatedUser(checkReservationUser);
         return ResponseEntity.ok(Reservation.serializeReservation(savedReservation));
     }
 

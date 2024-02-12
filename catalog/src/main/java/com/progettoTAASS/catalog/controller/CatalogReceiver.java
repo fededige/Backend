@@ -43,9 +43,11 @@ public class CatalogReceiver {
         }
         User checkExistingUser = userRepository.findUserByUsername(userReceived.getUsername());
         System.out.println("\ncheckExistingUser: " + checkExistingUser);
-        if (checkExistingUser != null){
-            userRepository.delete(checkExistingUser);
-        } else {
+        if(checkExistingUser != null){
+            checkExistingUser.setCoins(userReceived.getCoins());
+            userRepository.save(checkExistingUser);
+        }
+        else {
             userRepository.save(userReceived);
         }
     }

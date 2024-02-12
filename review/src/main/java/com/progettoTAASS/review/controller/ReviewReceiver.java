@@ -46,9 +46,11 @@ public class ReviewReceiver {
         System.out.println("userReceived.getUsername()" + userReceived.getUsername());
         User checkExistingUser = userRepository.findByUsername(userReceived.getUsername());
         System.out.println("\ncheckExistingUser: " + checkExistingUser);
-        if (checkExistingUser != null){
-            userRepository.delete(checkExistingUser);
-        } else {
+        if(checkExistingUser != null){
+            checkExistingUser.setCoins(userReceived.getCoins());
+            userRepository.save(checkExistingUser);
+        }
+        else {
             userRepository.save(userReceived);
         }
     }

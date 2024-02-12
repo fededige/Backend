@@ -42,11 +42,13 @@ public class UserSender {
             ObjectNode rootNode = objectMapper.createObjectNode();
             rootNode.put("username", user.getUsername());
             rootNode.put("email", user.getEmail());
+            rootNode.put("coins", user.getCoins());
             String userJson = objectMapper.writeValueAsString(rootNode);
 
             rabbitTemplate.convertAndSend(exchange, routingCatalogKey, userJson);
-            rabbitTemplate.convertAndSend(exchange, routingReservationKey, userJson);
             rabbitTemplate.convertAndSend(exchange, routingReviewUserKey, userJson);
+            rabbitTemplate.convertAndSend(exchange, routingReservationKey, userJson);
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

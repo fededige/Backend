@@ -51,6 +51,7 @@ public class UserController {
         User u;
         if(checkExistingUser == null){
             System.out.println(newUser);
+            newUser.setCoins(5);
             u = userRepository.save(newUser);
             userSender.sendNewUser(u);
         }
@@ -71,9 +72,9 @@ public class UserController {
         return ResponseEntity.ok(userToDelete);
     }
 
-    @GetMapping("/{id}/coins")
-    public ResponseEntity<Integer> getUserCoins(@PathVariable int id) {
-        User currentUser = userRepository.findUserById(id);
+    @GetMapping("/getCoins")
+    public ResponseEntity<Integer> getUserCoins(@RequestParam String username) {
+        User currentUser = userRepository.findUserByUsername(username);
         if(currentUser == null)
             return ResponseEntity.notFound().build();
 

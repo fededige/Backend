@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.progettoTAASS.Reservation.model.Book;
 import com.progettoTAASS.Reservation.model.Reservation;
+import com.progettoTAASS.Reservation.model.User;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class ReservationSender {
 
     @Value("${rabbitmq.routing.reviewReservation.key}")
     private String routingReviewReservationKey;
+
+    @Value("${rabbitmq.routing.reservationUser.key}")
+    private String routingReservationUserKey;
 
 
 
@@ -66,4 +70,18 @@ public class ReservationSender {
         }
     }
 
+    public void sendUpdatedUser(User checkReservationUser) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            ObjectNode rootNode = objectMapper.createObjectNode();
+            rootNode.put("email", checkReservationUser.getEmail());
+            rootNode.put("username", checkReservationUser.getUsername());
+            rootNode.put("coins", checkReservationUser.getCoins());
+            String userJson = objectMapper.writeValueAsString(rootNode);
+            System.out.println("\n\nuserJson in sendUpdatedUser" + userJson);
+            rabbitTemplate.convertAndSend(exchange, routingReservationUserKey, userJson);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

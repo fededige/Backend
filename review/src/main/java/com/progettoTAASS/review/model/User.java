@@ -22,4 +22,7 @@ public class User {
 
     @Column(name = "email")
     private String email;
+
+    @Column(name = "coins")
+    private int coins;
 }

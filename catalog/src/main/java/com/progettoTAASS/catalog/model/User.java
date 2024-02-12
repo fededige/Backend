@@ -21,6 +21,9 @@ public class User {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "coins")
+    private int coins;
+
     public User(String username) {
         this.username = username;
     }

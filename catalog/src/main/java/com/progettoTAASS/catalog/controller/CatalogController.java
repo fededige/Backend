@@ -91,14 +91,10 @@ public class CatalogController {
         return checkBook != null ? ResponseEntity.ok(Book.serializeBook(checkBook)) : ResponseEntity.notFound().build();
     }
 
-    /**
-     * This method is used to get a book by OWNER_ID
-     * @param owner_id the owner id
-     * @return ResponseEntity< List<Book> >
-     */
-    @GetMapping("/getBookByOwner/{owner_id}")
-    public ResponseEntity<List<String>> getBooksByOwner(@PathVariable int owner_id){
-        List<Book> books = bookRepository.findByOwner(userRepository.findById(owner_id));
+
+    @GetMapping("/getBookByOwner")
+    public ResponseEntity<List<String>> getBooksByOwner(@RequestParam String username){
+        List<Book> books = bookRepository.findByOwner(userRepository.findUserByUsername(username));
         List<String> ret = new ArrayList<>();
         for (Book book : books){
             ret.add(Book.serializeBook(book));
