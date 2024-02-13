@@ -46,6 +46,7 @@ public class ReservationReceiver {
         User checkExistingUser = userRepository.findUserByUsername(userReceived.getUsername());
         System.out.println("\ncheckExistingUser: " + checkExistingUser);
         if(checkExistingUser != null){
+            checkExistingUser.setCoins(userReceived.getCoins());
             userRepository.save(checkExistingUser);
         }
         else {

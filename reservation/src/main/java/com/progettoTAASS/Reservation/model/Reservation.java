@@ -30,6 +30,10 @@ import java.util.Date;
         @Column(name = "date")
         private Date date;
 
+        @Column(name = "returned")
+        private boolean returned;
+
+
         @JsonBackReference
         @ManyToOne
         @JoinColumn(name = "book", nullable = false)

@@ -82,14 +82,15 @@ public class UserController {
     }
 
     // Potrebbe essere gestito da un microservizio a parte
-    @PostMapping("/{id}/coins/add")
-    public ResponseEntity<User> addUserCoins(@PathVariable int id, @RequestBody int coins) {
-        User currentUser = userRepository.findUserById(id);
+    @PostMapping("/addCoins")
+    public ResponseEntity<User> addUserCoins(@RequestParam String username, @RequestBody int coins) {
+        User currentUser = userRepository.findUserByUsername(username);
         if(currentUser == null)
             return ResponseEntity.notFound().build();
 
-        currentUser.setCoins(coins);
+        currentUser.setCoins(currentUser.getCoins() + coins);
         User savedUser = userRepository.save(currentUser);
+        userSender.sendNewUser(savedUser);
 
         return ResponseEntity.ok(savedUser);
     }
