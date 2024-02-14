@@ -1,16 +1,22 @@
 package com.progettoTAASS.catalog.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.progettoTAASS.catalog.model.Book;
 import com.progettoTAASS.catalog.model.User;
 import com.progettoTAASS.catalog.repository.BookRepository;
 import com.progettoTAASS.catalog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +30,8 @@ public class CatalogController {
     private UserRepository userRepository;
     @Autowired
     private CatalogSender catalogSender;
+    @Value("${user_url}")
+    private String user_url;
 
     //==========================================================
 //    JUST FOR TESTING - REMOVE
@@ -108,7 +116,7 @@ public class CatalogController {
      */
     @GetMapping("/getBestsellers")
     public ResponseEntity<List<String>> getMostReadEver(){
-        Page<Book> mostRead = bookRepository.findAll(PageRequest.of(0, LIMIT, Sort.by(Sort.Order.desc("timesRead"))));
+        Page<Book> mostRead = bookRepository.findBookByAvailable(true, PageRequest.of(0, LIMIT, Sort.by(Sort.Order.desc("timesRead"))));
         System.out.println(mostRead);
         List<String> ret = new ArrayList<>();
         for (Book book : mostRead){
@@ -126,7 +134,8 @@ public class CatalogController {
      */
     @GetMapping("/getMonthTrend")
     public ResponseEntity<List<String>> getMostReadThisMonth(){
-        Page<Book> mostReadThisMonth = bookRepository.findAll(PageRequest.of(0, LIMIT, Sort.by(Sort.Order.desc("timesReadThisMonth"))));
+
+        Page<Book> mostReadThisMonth = bookRepository.findBookByAvailable(true, PageRequest.of(0, LIMIT, Sort.by(Sort.Order.desc("timesReadThisMonth"))));
         List<String> ret = new ArrayList<>();
         for (Book book : mostReadThisMonth){
             if(book.isAvailable()){
@@ -164,8 +173,9 @@ public class CatalogController {
      * @return ResponseEntity< Book >
      */
     @PostMapping(value = "/insert", consumes = "application/json")
-    public ResponseEntity<String> saveBook(@RequestBody Book book){
+    public ResponseEntity<String> saveBook(@RequestBody Book book, @RequestHeader(HttpHeaders.AUTHORIZATION) String idToken){
         System.out.println(book);
+        System.out.println("idToken: " + idToken);
         book.setTimesRead(0);
         book.setTimesReadThisMonth(0);
         book.setAvailable(true);
@@ -177,7 +187,34 @@ public class CatalogController {
         Book savedBook = bookRepository.save(book);
         System.out.println(savedBook);
         catalogSender.sendBook(book);
+        if(!addCoinUser(book.getOwner(), idToken)){
+            return ResponseEntity.internalServerError().build();
+        }
         return ResponseEntity.ok(Book.serializeBook(savedBook));
+    }
+
+    private boolean addCoinUser(User owner, String idToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(idToken.split("Bearer ")[1]);
+        System.out.println(headers);
+        ResponseEntity<Boolean> response;
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode rootNode = objectMapper.createObjectNode();
+            rootNode.put("coins", 1);
+            System.out.println(rootNode);
+            System.out.println(objectMapper.writeValueAsString(rootNode));
+            HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(rootNode), headers);
+            System.out.println("http://" + user_url + "/addCoins?username=" + owner.getUsername() + "\n request: " + request);
+            response = restTemplate.postForEntity("http://" + user_url + "/addCoins?username=" + owner.getUsername(), request, Boolean.class);
+            System.out.println("response" + response);
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return Boolean.TRUE.equals(response.getBody());
     }
 
     /**

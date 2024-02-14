@@ -1,6 +1,7 @@
 package com.progettoTAASS.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.progettoTAASS.user.model.*;
@@ -82,17 +83,23 @@ public class UserController {
     }
 
     // Potrebbe essere gestito da un microservizio a parte
-    @PostMapping("/addCoins")
-    public ResponseEntity<User> addUserCoins(@RequestParam String username, @RequestBody int coins) {
+    @PostMapping(value = "/addCoins")
+    public Boolean addUserCoins(@RequestParam String username, @RequestBody JsonNode body) {
+        ObjectMapper objectMapper = new ObjectMapper();
         User currentUser = userRepository.findUserByUsername(username);
         if(currentUser == null)
-            return ResponseEntity.notFound().build();
-
-        currentUser.setCoins(currentUser.getCoins() + coins);
+            return false;
+        try {
+            int coins = objectMapper.readValue(body.get("coins").toString(), Integer.class);
+            currentUser.setCoins(currentUser.getCoins() + coins);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         User savedUser = userRepository.save(currentUser);
         userSender.sendNewUser(savedUser);
 
-        return ResponseEntity.ok(savedUser);
+//        return ResponseEntity.ok(savedUser);
+        return true;
     }
 
 

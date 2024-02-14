@@ -76,6 +76,7 @@ services:
     image: project-catalog
     container_name: prog-catalog_c
     environment:
+      USER_HOST: user
       POSTGRES_DB_HOST: db-catalog
       API_GATEWAY_HOST: api-gateway
       RABBITMQ_HOST: rabbitmq

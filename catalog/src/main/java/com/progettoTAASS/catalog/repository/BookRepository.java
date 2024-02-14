@@ -14,8 +14,12 @@ import java.util.List;
 public interface BookRepository extends JpaRepository<Book, Integer> {
     Book findById(int id);
     Page<Book> findAll(Pageable pageable);
+
+    Page<Book> findBookByAvailable(boolean available, Pageable pageable);
     List<Book> findByOwner(User owner);
     Book findAllByAuthorAndPublishingDateAndTitleAndOwner(String author, Date publishingDate, String title, User owner);
+
+
 
     List<Book> findByTitleContainingIgnoreCase(String title);
     List<Book> findByAuthorContainingIgnoreCase(String author);
