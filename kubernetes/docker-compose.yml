@@ -26,19 +26,18 @@ services:
       - frontend-network
     environment:
       - USER_HOST=user
-      - USER_PORT=8080
+      - USER_PORT=8083
       - CATALOG_HOST=catalog
-      - CATALOG_PORT=8080
+      - CATALOG_PORT=8081
       - RESERVATION_HOST=reservation
-      - RESERVATION_PORT=8080
+      - RESERVATION_PORT=8082
       - REVIEW_HOST=review
-      - REVIEW_PORT=8080
+      - REVIEW_PORT=8084
 
   db-catalog:
     container_name: db-catalog
     image: "postgres"
     networks:
-#      - project-network
       - project-catalog-internal
 #    ports:
 #      - "5432:5432"
@@ -68,14 +67,13 @@ services:
     networks:
       - project-network
       - project-catalog-internal
-#    ports:
-#      - "8080:8080"
+    ports:
+      - "8081:8080"
           
   db-user:
     container_name: db-user
     image: "postgres"
     networks:
-#      - project-network
       - project-user-internal
 #    ports:
 #      - "5432:5432"
@@ -104,14 +102,13 @@ services:
     networks:
       - project-network
       - project-user-internal
-#    ports:
-#      - "8080:8080"
+    ports:
+      - "8083:8080"
 
   db-reservation:
     container_name: db-reservation
     image: "postgres"
     networks:
-#      - project-network
       - project-reservation-internal
 #    ports:
 #      - "5432:5432"
@@ -140,14 +137,13 @@ services:
     networks:
       - project-network
       - project-reservation-internal
-#    ports:
-#      - "8080:8080"
+    ports:
+      - "8082:8080"
 
   db-review:
     container_name: db-review
     image: "postgres"
     networks:
-#      - project-network
       - project-review-internal
 #    ports:
 #      - "5432:5432"
@@ -176,8 +172,8 @@ services:
     networks:
       - project-network
       - project-review-internal
-#    ports:
-#      - "8080:8080"
+    ports:
+      - "8084:8080"
 
   frontend:
     image: fededige/readcycle:frontend
