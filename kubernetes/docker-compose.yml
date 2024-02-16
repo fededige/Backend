@@ -39,8 +39,8 @@ services:
     image: "postgres"
     networks:
       - project-catalog-internal
-#    ports:
-#      - "5432:5432"
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: project-catalog
       POSTGRES_USER: catalog
@@ -75,8 +75,8 @@ services:
     image: "postgres"
     networks:
       - project-user-internal
-#    ports:
-#      - "5432:5432"
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_DB: project-user
       POSTGRES_USER: user
@@ -110,8 +110,8 @@ services:
     image: "postgres"
     networks:
       - project-reservation-internal
-#    ports:
-#      - "5432:5432"
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_DB: project-reservation
       POSTGRES_USER: reservation
@@ -145,8 +145,8 @@ services:
     image: "postgres"
     networks:
       - project-review-internal
-#    ports:
-#      - "5432:5432"
+    ports:
+      - "5435:5432"
     environment:
       POSTGRES_DB: project-review
       POSTGRES_USER: review

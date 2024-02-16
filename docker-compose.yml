@@ -15,25 +15,6 @@ services:
         source: data-rabbitmq
         target: /var/lib/rabbitmq
 
-#  pgadmin:
-#    container_name: pgadmin_container
-#    image: dpage/pgadmin4
-#    restart: always
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-#      PGADMIN_DEFAULT_PASSWORD: root
-#      PGADMIN_LISTEN_PORT: 50
-#    ports:
-#      - "5050:50"
-#    volumes:
-#      - pgadmin-data:/var/lib/pgadmin
-#    depends_on:
-#      - db-catalog
-#      - db-user
-#      - db-reservation
-#    networks:
-#      - project-network
-
   gateway:
     build: apiGateway/.
     image: project-gateway
@@ -59,6 +40,8 @@ services:
     image: "postgres"
     networks:
       - project-network
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: project-catalog
       POSTGRES_USER: catalog
@@ -91,6 +74,8 @@ services:
     image: "postgres"
     networks:
       - project-network
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: project-user
       POSTGRES_USER: user
@@ -111,7 +96,6 @@ services:
       POSTGRES_DB_HOST: db-user
       API_GATEWAY_HOST: api-gateway
       RABBITMQ_HOST: rabbitmq
-#      REVIEW_HOST: review
     depends_on:
       - db-user
       - rabbitmq
@@ -123,6 +107,8 @@ services:
     image: "postgres"
     networks:
       - project-network
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: project-reservation
       POSTGRES_USER: reservation
@@ -154,6 +140,8 @@ services:
     image: "postgres"
     networks:
       - project-network
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: project-review
       POSTGRES_USER: review
@@ -174,7 +162,6 @@ services:
       POSTGRES_DB_HOST: db-review
       API_GATEWAY_HOST: api-gateway
       RABBITMQ_HOST: rabbitmq
-#      USER_HOST: user
     depends_on:
       - db-review
       - rabbitmq
@@ -192,6 +179,3 @@ volumes:
   data-db-review:
   data-rabbitmq:
   pgadmin-data:
-
-
-# docker-compose build && docker-compose up

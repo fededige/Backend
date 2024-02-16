@@ -32,6 +32,8 @@ public class CatalogController {
     private CatalogSender catalogSender;
     @Value("${user_url}")
     private String user_url;
+    @Value("${user_url_kub}")
+    private String user_url_kub;
 
     //==========================================================
 //    JUST FOR TESTING - REMOVE
@@ -200,15 +202,26 @@ public class CatalogController {
         headers.setBearerAuth(idToken.split("Bearer ")[1]);
         System.out.println(headers);
         ResponseEntity<Boolean> response;
+        HttpEntity<String> request;
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode rootNode = objectMapper.createObjectNode();
             rootNode.put("coins", 1);
             System.out.println(rootNode);
             System.out.println(objectMapper.writeValueAsString(rootNode));
-            HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(rootNode), headers);
-            System.out.println("http://" + user_url + "/addCoins?username=" + owner.getUsername() + "\n request: " + request);
-            response = restTemplate.postForEntity("http://" + user_url + "/addCoins?username=" + owner.getUsername(), request, Boolean.class);
+            request = new HttpEntity<>(objectMapper.writeValueAsString(rootNode), headers);
+            System.out.println("http://" + user_url + "/user/addCoins?username=" + owner.getUsername() + "\n request: " + request);
+            try{
+                response = restTemplate.postForEntity("http://" + user_url_kub + "/addCoins?username=" + owner.getUsername(), request, Boolean.class);
+            }
+            catch (Exception e){
+                try{
+                    response = restTemplate.postForEntity("http://" + user_url + "/addCoins?username=" + owner.getUsername(), request, Boolean.class);
+                } catch (Exception ee){
+                    ee.printStackTrace();
+                    return false;
+                }
+            }
             System.out.println("response" + response);
         } catch (Exception e){
             e.printStackTrace();
