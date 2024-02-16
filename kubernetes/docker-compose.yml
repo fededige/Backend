@@ -1,6 +1,5 @@
 version: '3'
 services:
-
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -16,8 +15,7 @@ services:
         target: /var/lib/rabbitmq
 
   gateway:
-    build: apiGateway/.
-    image: project-gateway
+    image: fededige/readcycle:gateway
     container_name: gateway
     ports:
       - "8080:8080"
@@ -25,21 +23,24 @@ services:
       - rabbitmq
     networks:
       - project-network
+      - frontend-network
     environment:
       - USER_HOST=user
-      - USER_PORT=8080
+      - USER_PORT=8083
       - CATALOG_HOST=catalog
-      - CATALOG_PORT=8080
+      - CATALOG_PORT=8081
       - RESERVATION_HOST=reservation
-      - RESERVATION_PORT=8080
+      - RESERVATION_PORT=8082
       - REVIEW_HOST=review
-      - REVIEW_PORT=8080
+      - REVIEW_PORT=8084
 
   db-catalog:
     container_name: db-catalog
     image: "postgres"
     networks:
-      - project-network
+      - project-catalog-internal
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: project-catalog
       POSTGRES_USER: catalog
@@ -53,8 +54,7 @@ services:
           nocopy: true
   
   catalog:
-    build: catalog/.
-    image: project-catalog
+    image: fededige/readcycle:catalog
     container_name: prog-catalog_c
     environment:
       USER_HOST: user
@@ -66,12 +66,17 @@ services:
       - rabbitmq
     networks:
       - project-network
+      - project-catalog-internal
+    ports:
+      - "8081:8080"
           
   db-user:
     container_name: db-user
     image: "postgres"
     networks:
-      - project-network
+      - project-user-internal
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_DB: project-user
       POSTGRES_USER: user
@@ -85,8 +90,7 @@ services:
           nocopy: true
 
   user:
-    build: user/.
-    image: project-user
+    image: fededige/readcycle:user
     container_name: prog-user_c
     environment:
       POSTGRES_DB_HOST: db-user
@@ -97,12 +101,17 @@ services:
       - rabbitmq
     networks:
       - project-network
+      - project-user-internal
+    ports:
+      - "8083:8080"
 
   db-reservation:
     container_name: db-reservation
     image: "postgres"
     networks:
-      - project-network
+      - project-reservation-internal
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_DB: project-reservation
       POSTGRES_USER: reservation
@@ -116,8 +125,7 @@ services:
           nocopy: true
 
   reservation:
-    build: reservation/.
-    image: project-reservation
+    image: fededige/readcycle:reservation
     container_name: prog-reservation_c
     environment:
       POSTGRES_DB_HOST: db-reservation
@@ -128,12 +136,17 @@ services:
       - rabbitmq
     networks:
       - project-network
+      - project-reservation-internal
+    ports:
+      - "8082:8080"
 
   db-review:
     container_name: db-review
     image: "postgres"
     networks:
-      - project-network
+      - project-review-internal
+    ports:
+      - "5435:5432"
     environment:
       POSTGRES_DB: project-review
       POSTGRES_USER: review
@@ -147,8 +160,7 @@ services:
           nocopy: true
 
   review:
-    build: review/.
-    image: project-review
+    image: fededige/readcycle:review
     container_name: prog-review_c
     environment:
       POSTGRES_DB_HOST: db-review
@@ -159,10 +171,26 @@ services:
       - rabbitmq
     networks:
       - project-network
+      - project-review-internal
+    ports:
+      - "8084:8080"
 
+  frontend:
+    image: fededige/readcycle:frontend
+    container_name: frontend
+    ports:
+      - "4200:4200"
+    networks:
+      - frontend-network
 
 networks:
   project-network:
+  frontend-network:
+  project-catalog-internal:
+  project-user-internal:
+  project-reservation-internal:
+  project-review-internal:
+
 
 volumes:
   data-db-user:
